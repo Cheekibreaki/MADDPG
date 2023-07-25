@@ -5,11 +5,11 @@ map_id_train_set: /../assets/map_id_1.txt
 map_id_eval_set: /../assets/map_id_1.txt
 
 # [GC,LC,NC]
-comm_mode: GC
+comm_mode: NC
 
 # robots settings
 robots:
-  number: 2
+  number: 1
   robotRadius: 3
   commRange: 60
   syncRange: 20

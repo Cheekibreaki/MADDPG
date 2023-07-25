@@ -3,6 +3,7 @@ import robot_exploration_v1
 from maddpg.MADDPG import MADDPG
 import numpy as np
 import torch as th
+import torch.nn as nn
 from tensorboardX import SummaryWriter
 from copy import copy,deepcopy
 from torch.distributions import categorical
@@ -10,13 +11,15 @@ from sim_utils import onehot_from_action
 import time
 import os
 import yaml
-
+print(th.cuda.is_available())
 # do not render the scene
-e_render = False
+e_render = True
 # tensorboard writer
 time_now = time.strftime("%m%d_%H%M%S")
 writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
 
+num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
+num_step_file.close()
 food_reward = 10.
 poison_reward = -1.
 encounter_reward = 0.01
@@ -34,13 +37,13 @@ n_pose = 2
 # capacity = 1000000
 capacity = 5000
 # batch_size = 1000
-batch_size = 100
+batch_size = 15
 
-n_episode = 200000
+n_episode = 1000
 # max_steps = 1000
 max_steps = 50
 # episodes_before_train = 1000
-episodes_before_train = 100
+episodes_before_train = 15
 
 win = None
 param = None
@@ -73,6 +76,7 @@ if load_model:
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 for i_episode in range(n_episode):
+    # print("started 1")
     try:
         obs,pose = world.reset()
         pose = th.tensor(pose)
@@ -96,25 +100,32 @@ for i_episode in range(n_episode):
     total_reward = 0.0
     rr = np.zeros((n_agents,))
     wrong_step = 0
+    # print("started 2")
+    num_steps = 0
     for t in range(max_steps):
+        num_steps = num_steps + 1
+        # print("test")
         # render every 100 episodes to speed up training
-        if i_episode % 100 == 0 and e_render:
+        if i_episode % 10 == 0 and e_render:
             world.render()
         obs_history = obs_history.type(FloatTensor)
         action_probs = maddpg.select_action(obs_history, pose).data.cpu()
         action_probs_valid = np.copy(action_probs)
         action = []
-        for i,probs in enumerate(action_probs):
-            print("i",i)
-            rbt = world.robots[i]
-            for j,frt in enumerate(rbt.get_frontiers()):
-                if len(frt) == 0:
-                    action_probs_valid[i][j] = 0
+        # for i,probs in enumerate(action_probs):
+        #     rbt = world.robots[i]
+        rbt = world.robots[0]
+        # print(action_probs_valid[0])
+        for j, frt in enumerate(rbt.get_frontiers()):
+            if len(frt) == 0:
+                # print(action_probs_valid[0][j])
+                action_probs_valid[j] = 0
+        action.append(categorical.Categorical(probs=th.tensor(action_probs_valid)).sample())
 
-            # print("action_probs",th.tensor(action_probs_valid[i]))
-            # print("action_probs", th.tensor(action_probs_valid[i]).type())
-            # action_probs_tensor = torch.tensor(action_probs_scalar).unsqueeze(0)
-            action.append(categorical.Categorical(probs=th.tensor(action_probs_valid[i]).unsqueeze(0)).sample())
+            # for j,frt in enumerate(rbt.get_frontiers()):
+            #     if len(frt) == 0:
+            #         print(action_probs_valid[i][j])
+            #         action_probs_valid[i][j] = 0
             # action.append(categorical.Categorical(probs=th.tensor(action_probs_valid[i])).sample())
 
         action = th.tensor(onehot_from_action(action))
@@ -137,9 +148,11 @@ for i_episode in range(n_episode):
         obs_t_minus_1 = copy(obs_t_minus_0)
         obs_t_minus_0 = copy(obs_)
         obs_history_ = np.zeros((n_agents, obs.shape[1] * 6, obs.shape[2]))
-        for i in range(n_agents):
-            obs_history_[i] = np.vstack((obs_t_minus_0[i], obs_t_minus_1[i], obs_t_minus_2[i],
-                                             obs_t_minus_3[i], obs_t_minus_4[i], obs_t_minus_5[i]))
+        # for i in range(n_agents):
+        #     obs_history_[i] = np.vstack((obs_t_minus_0[i], obs_t_minus_1[i], obs_t_minus_2[i],
+        #                                      obs_t_minus_3[i], obs_t_minus_4[i], obs_t_minus_5[i]))
+        obs_history_[0] = np.vstack((obs_t_minus_0[0], obs_t_minus_1[0], obs_t_minus_2[0],
+                                             obs_t_minus_3[0], obs_t_minus_4[0], obs_t_minus_5[0]))
 
         if t != max_steps - 1:
             next_obs_history = th.tensor(obs_history_)
@@ -153,10 +166,18 @@ for i_episode in range(n_episode):
         maddpg.memory.push(obs_history, action, next_obs_history, reward, pose, next_pose)
         obs_history = next_obs_history
         pose = next_pose
-        if t % 10 == 0:
+        if t % 5 == 0:
+            # print("update policy")
             c_loss, a_loss = maddpg.update_policy()
+            # print("update policy end")
         if done:
             break
+    # print("rr", rr)
+    num_step_file = open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "a")
+    num_step_file.write("eps: " + str(i_episode) + " #step: " + str(num_steps) + "\n")
+
+    num_step_file.close()
+
 
     # if not discard:
     maddpg.episode_done += 1
@@ -174,9 +195,13 @@ for i_episode in range(n_episode):
     print('Episode: %d, reward = %f' % (i_episode, total_reward))
     reward_record.append(total_reward)
     # visual
-    writer.add_scalars('scalar/reward',{'total_rwd':total_reward,'r0_rwd':rr[0],'r1_rwd':rr[1]},i_episode)
+    # writer.add_scalars('scalar/reward',{'total_rwd':total_reward,'r0_rwd':rr[0],'r1_rwd':rr[1]},i_episode)
+    writer.add_scalars('scalar/reward', {'total_rwd': total_reward, 'r0_rwd': rr[0]}, i_episode)
     if i_episode > episodes_before_train and i_episode % 10 == 0:
-        writer.add_scalars('scalar/mean_rwd',{'mean_reward':np.mean(reward_record[-100:])}, i_episode)
+        print(reward_record)
+        mean_reward = th.mean(th.stack(reward_record[-100:]).cpu()).item()
+        writer.add_scalars('scalar/mean_rwd', {'mean_reward': mean_reward}, i_episode)
+        # writer.add_scalars('scalar/mean_rwd',{'mean_reward':np.mean(reward_record[-100:])}, i_episode)
     if not c_loss is None:
         writer.add_scalars('loss/c_loss',{'r0':c_loss[0],'r1':c_loss[1]},i_episode)
     if not a_loss is None:
