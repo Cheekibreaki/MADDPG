@@ -44,11 +44,13 @@ class Robot():
             h, w = self.maze.shape
             y_min, y_max = int(0.1 * h), int(0.8 * h)
             x_min, x_max = int(0.1 * w), int(0.8 * w)
-            y = np.random.randint(y_min, y_max)
-            x = np.random.randint(x_min, x_max)
+            # y = np.random.randint(y_min, y_max)
+            # x = np.random.randint(x_min, x_max)
+            y = y_min
+            x = x_min
             while self.maze[y, x] == self.config['color']['obstacle']:
-                y = np.random.randint(y_min, y_max)
-                x = np.random.randint(x_min, x_max)
+                y = y+1
+                x = x+1
             return y, x
         else:
             return self.config['robots']['startPose']['y'], self.config['robots']['startPose']['x']

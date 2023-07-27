@@ -55,6 +55,7 @@ def init_processes(rank, size, fn, backend='gloo'):
     fn(rank, size)
 
 def onehot_from_action(actions):
+
     onehot = np.zeros((len(actions),8))
     for i,action in enumerate(actions):
         onehot[i,action] = 1
