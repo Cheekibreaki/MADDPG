@@ -50,6 +50,11 @@ class MADDPG:
         self.actors_target = deepcopy(self.actors)
         self.critics_target = deepcopy(self.critics)
 
+        for x in self.actors:
+            x.eval()
+        for x in self.critics:
+            x.eval()
+
         if self.use_cuda:
             for x in self.actors:
                 x.cuda()
