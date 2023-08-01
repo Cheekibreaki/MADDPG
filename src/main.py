@@ -107,7 +107,7 @@ prev_critic = None
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 for i_episode in range(n_episode):
 
-
+    print("new step")
 
 
     # print("started 1")

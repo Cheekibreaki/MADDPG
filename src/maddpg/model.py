@@ -50,9 +50,10 @@ class Critic(basic_module.BasicModule):
         hist_obs = t.stack((hist_0, hist_1, hist_2, hist_3, hist_4, hist_5))
         # hist_obs = t.stack((hist_0, hist_1, hist_2))
         batch_size = hist_obs.shape[1]
-        h0 = t.randn(1, batch_size, 256)
-        c0 = t.randn(1, batch_size, 256)
-        _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
+        # h0 = t.randn(1, batch_size, 256)
+        # c0 = t.randn(1, batch_size, 256)
+        _, (hn, cn) = self.rnn(hist_obs)
+        # _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
         s, b, h = hn.shape
         out = hn.contiguous().view(b,-1)
         b,n,d = acts.shape
@@ -90,7 +91,7 @@ class Actor(basic_module.BasicModule):
         # NCHW 转 NHWC
         # obs' shape: batch_size x agent_number x observation's shape
         # obs = (obs-t.min(obs))/(t.max(obs)-t.min(obs))
-        print("forwarded")
+        # print("forwarded")
         poses = poses.type(t.float32)
         _,r,c = obs.shape
         obs_5 = t.unsqueeze(obs[:,0:1*int(r/6)],dim=1)
@@ -130,15 +131,15 @@ class Actor(basic_module.BasicModule):
         desired_value = np.array([[33, 160]])
         desired_value2 = np.array([[71, 142]])
         print(poses)
-        if np.array_equal(poses, desired_value):
-            print("The variable has the desired value.")
-        else:
-            print("The variable does not have the desired value.")
+        # if np.array_equal(poses, desired_value):
+        #     print("The variable has the desired value.")
+        # else:
+        #     print("The variable does not have the desired value.")
 
-        if np.array_equal(poses, desired_value2):
-            print("The variable has the desired value.")
-        else:
-            print("The variable does not have the desired value.")
+        # if np.array_equal(poses, desired_value2):
+        #     print("The variable has the desired value.")
+        # else:
+        #     print("The variable does not have the desired value.")
 
 
 
