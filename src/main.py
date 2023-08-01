@@ -12,8 +12,19 @@ import time
 import os
 import yaml
 from datetime import datetime
+import glob
 
+def remove_files_with_prefix(directory, prefix):
+    # Get a list of files matching the prefix pattern in the specified directory
+    file_list = glob.glob(os.path.join(directory, f"{prefix}*"))
 
+    # Iterate through the files and remove them one by one
+    for file_path in file_list:
+        try:
+            os.remove(file_path)
+            print(f"Removed file: {file_path}")
+        except Exception as e:
+            print(f"Error while removing {file_path}: {e}")
 
 
 print(th.cuda.is_available())
@@ -44,23 +55,24 @@ n_pose = 2
 # capacity = 1000000
 capacity = 5000
 # batch_size = 1000
-batch_size = 1
+batch_size = 400
 
-n_episode = 1000
+n_episode = 3000
 # max_steps = 1000
 max_steps = 50
 # episodes_before_train = 1000
-episodes_before_train = 10
+episodes_before_train = 400
 
-model_save_eps = 10
+model_save_eps = 30
 
+highest_total_reward = float('-inf')
 
 win = None
 param = None
 avg = None
 load_model = True
 
-MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_07_26_21_45_55\model-100.pth'
+MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_07_28_14_25_59\model-2220.pth'
 CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
 current_time = datetime.now()
 time_string = current_time.strftime('%Y_%m_%d_%H_%M_%S')
@@ -70,6 +82,8 @@ maddpg = MADDPG(n_agents, n_states, n_actions, n_pose, batch_size, capacity,
                 episodes_before_train)
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
+
+
 
 if load_model:
 
@@ -92,6 +106,10 @@ prev_critic = None
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 for i_episode in range(n_episode):
+
+
+
+
     # print("started 1")
     try:
         obs,pose = world.reset(random=True)
@@ -192,12 +210,29 @@ for i_episode in range(n_episode):
     # print("rr", rr)
     num_step_file = open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "a")
     num_step_file.write("eps: " + str(i_episode) + " #step: " + str(num_steps) + "\n")
-
+    num_step_file.write("eps: " + str(i_episode) + " #reward: " + str(total_reward) + "\n")
     num_step_file.close()
 
-
-    # if not discard:
     maddpg.episode_done += 1
+    
+    if total_reward>highest_total_reward:
+        highest_total_reward = total_reward
+        
+        remove_files_with_prefix(MODEL_DIR,'highest_model')
+        print('Save highest Models......')
+        if not os.path.exists(MODEL_DIR):
+            os.makedirs(MODEL_DIR)
+        dicts = {}
+
+        for i in range(maddpg.n_agents):
+            dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
+            dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
+            dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
+            dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
+        th.save(dicts, MODEL_DIR + '/highest_model-%d.pth' % (maddpg.episode_done))
+    
+    # if not discard:
+    
     if maddpg.episode_done % model_save_eps == 0:
         print('Save Models......')
         if not os.path.exists(MODEL_DIR):

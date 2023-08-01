@@ -69,6 +69,7 @@ def onehot_from_logits(logits, eps=0.0):
     """
     # get best (according to current policy) actions in one-hot form
     argmax_acs = (logits == logits.max(1, keepdim=True)[0]).float()
+    print("eps", eps)
     if eps == 0.0:
         return argmax_acs
     # get random actions in one-hot form

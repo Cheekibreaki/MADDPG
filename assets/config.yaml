@@ -17,8 +17,10 @@ robots:
     x: 0
     y: 0
   resetRandomPose: 1
-  w1: 0.00002
-  w2: 0.001
+  # w1: 0.00002
+  # w2: 0.001
+  w1: 1
+  w2: 0
   w3: 0.1
   subregionSize:
     y: 20

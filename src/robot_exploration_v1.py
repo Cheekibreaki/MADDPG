@@ -263,6 +263,7 @@ class RobotExplorationT1(gym.Env):
 
 if __name__ == '__main__':
     env = RobotExplorationT1()
+    print("test")
     for i in range(1000):
         obs_n = env.reset()
         for _ in range(100):
