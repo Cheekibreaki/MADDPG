@@ -130,6 +130,9 @@ class Actor(basic_module.BasicModule):
 
         desired_value = np.array([[33, 160]])
         desired_value2 = np.array([[71, 142]])
+        # if the same actions?
+        # check networks of the values behind the action
+        # check the whole state space, if the frontiers are different
         print(poses)
         # if np.array_equal(poses, desired_value):
         #     print("The variable has the desired value.")
@@ -143,7 +146,7 @@ class Actor(basic_module.BasicModule):
 
 
 
-        # action = gumbel_softmax(action)
+        action = gumbel_softmax(action)
         return action
 
     def num_flat_features(self, x):
