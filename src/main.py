@@ -70,7 +70,7 @@ highest_total_reward = float('-inf')
 win = None
 param = None
 avg = None
-load_model = True
+load_model = False
 
 MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_07_28_14_25_59\model-2220.pth'
 CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
