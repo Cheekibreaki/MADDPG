@@ -12,7 +12,7 @@ import os
 import yaml
 
 # do not render the scene
-e_render = False
+e_render = True
 # tensorboard writer
 time_now = time.strftime("%m%d_%H%M%S")
 writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
@@ -105,7 +105,6 @@ for i_episode in range(n_episode):
         action_probs_valid = np.copy(action_probs)
         action = []
         for i,probs in enumerate(action_probs):
-            print("i",i)
             rbt = world.robots[i]
             for j,frt in enumerate(rbt.get_frontiers()):
                 if len(frt) == 0:

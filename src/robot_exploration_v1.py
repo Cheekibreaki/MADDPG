@@ -34,7 +34,7 @@ class RobotExplorationT1(gym.Env):
         self.reset()
 
     def reset(self,random=True):
-        plt.close(all)
+        plt.close('all')
         print("train",type(self.map_id_set_train))
         self.map_id_set_train=self.map_id_set_train.reshape(-1)
         if random:
