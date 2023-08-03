@@ -155,8 +155,18 @@ for i_episode in range(n_episode):
             if len(frt) == 0:
                 # print(action_probs_valid[0][j])
                 action_probs_valid[j] = 0
-        action.append(categorical.Categorical(probs=th.tensor(action_probs_valid)).sample())
 
+        # action.append(th.distributions.categorical.Categorical(probs=th.tensor(action_probs_valid)).sample())
+
+        max_indicies = 0
+        non_zero_indices = np.nonzero(action_probs_valid)
+        if len(non_zero_indices[0]) > 0:
+            max_non_zero_index = np.argmax(action_probs_valid[non_zero_indices])  # Get index of maximum non-zero element
+            max_indicies = non_zero_indices[0][max_non_zero_index]
+        else:
+            max_indicies = np.argmax(action_probs_valid)  # If all values are zero, return the index of the first value
+
+        action.append(max_indicies)
             # for j,frt in enumerate(rbt.get_frontiers()):
             #     if len(frt) == 0:
             #         print(action_probs_valid[i][j])
