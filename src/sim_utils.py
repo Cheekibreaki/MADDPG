@@ -90,7 +90,7 @@ def gumbel_softmax_sample(logits, temperature):
     return F.softmax(y / temperature, dim=1)
 
 # modified for PyTorch from https://github.com/ericjang/gumbel-softmax/blob/master/Categorical%20VAE.ipynb
-def gumbel_softmax(logits, temperature=1.0, hard=False):
+def gumbel_softmax(logits, i_episode, temperature=1.0, hard=False):
     """Sample from the Gumbel-Softmax distribution and optionally discretize.
     Args:
       logits: [batch_size, n_class] unnormalized log-probs
@@ -101,6 +101,28 @@ def gumbel_softmax(logits, temperature=1.0, hard=False):
       If hard=True, then the returned sample will be one-hot, otherwise it will
       be a probabilitiy distribution that sums to 1 across classes
     """
+
+    def get_decayed_beta(prev_decayed_beta: float, i: int, beta_decay_ver) -> float:
+        decayed_beta = None
+        if beta_decay_ver == 'linear':
+            y = [1, 0.1, 0.01, 0.001]  # v5
+            x = [0, int(3000 * 0.2), int(3000 * 0.5), int(3000)]  # v5
+            min_v = y[0]
+            if i == 0:
+                decayed_beta = min_v
+            else:
+                for t, x_t in enumerate(x):
+                    if i <= x_t:
+                        interval = (y[t] - y[t - 1]) / (x_t - x[t - 1])
+                        decayed_beta = interval * (i - x[t - 1]) + y[t - 1]
+                        break
+        elif beta_decay_ver == 'exponential':
+            decayed_beta = max(prev_decayed_beta * 0.9999, 0.01)
+        else:
+            raise ValueError("The version of beta decay is not matched with current implementation.")
+        return decayed_beta
+    temperature = get_decayed_beta(temperature, i_episode, "exponential")
+
     y = gumbel_softmax_sample(logits, temperature)
     if hard:
         y_hard = onehot_from_logits(y)

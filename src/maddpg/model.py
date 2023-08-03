@@ -3,14 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from sim_utils import gumbel_softmax
-
-t.manual_seed(1234)
-
-
 from maddpg import basic_module
+t.manual_seed(1234)
+test = False
+
 
 class Critic(basic_module.BasicModule):
-
     def __init__(self, n_agent, dim_observation, dim_action, dim_pose):
         print("init critic")
         super(Critic, self).__init__()
@@ -29,7 +27,6 @@ class Critic(basic_module.BasicModule):
         # nn.init.xavier_uniform_(self.conv2.weight)
         # nn.init.xavier_uniform_(self.i2h1.weight)
         # nn.init.xavier_uniform_(self.fc.weight)
-
 
     # obs: batch_size * obs_dim
     def forward(self, obs, acts, poses):
@@ -55,14 +52,15 @@ class Critic(basic_module.BasicModule):
         hist_5 = F.relu(self.conv2(F.relu(self.conv1(obs_5))))
         hist_5 = hist_5.contiguous().view(-1, self.num_flat_features(hist_5))
 
-
         hist_obs = t.stack((hist_0, hist_1, hist_2, hist_3, hist_4, hist_5))
         # hist_obs = t.stack((hist_0, hist_1, hist_2))
         batch_size = hist_obs.shape[1]
-        # h0 = t.randn(1, batch_size, 256)
-        # c0 = t.randn(1, batch_size, 256)
-        _, (hn, cn) = self.rnn(hist_obs)
-        # _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
+        if test:
+            _, (hn, cn) = self.rnn(hist_obs)
+        else:
+            h0 = t.randn(1, batch_size, 256)
+            c0 = t.randn(1, batch_size, 256)
+            _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
         s, b, h = hn.shape
         out = hn.contiguous().view(b,-1)
         b,n,d = acts.shape
@@ -81,9 +79,7 @@ class Critic(basic_module.BasicModule):
         return num_features
 
 
-
 class Actor(basic_module.BasicModule):
-
     def __init__(self, n_agent, dim_pose):
         super(Actor, self).__init__()
         print("init actor")
@@ -102,12 +98,12 @@ class Actor(basic_module.BasicModule):
         # nn.init.xavier_uniform_(self.fc.weight)
         # self.fc = nn.Linear(self.hidden_dim, 8)
 
-    def forward(self, obs, poses):
+    def forward(self, obs, poses, i_episode):
         # NCHW 转 NHWC
         # obs' shape: batch_size x agent_number x observation's shape
         # obs = (obs-t.min(obs))/(t.max(obs)-t.min(obs))
         poses = poses.type(t.float32)
-        _,r,c = obs.shape
+        _, r, c = obs.shape
         obs_5 = t.unsqueeze(obs[:,0:1*int(r/6)],dim=1)
         obs_4 = t.unsqueeze(obs[:,1*int(r/6):2*int(r/6)],dim=1)
         obs_3 = t.unsqueeze(obs[:,2*int(r/6):3*int(r/6)],dim=1)
@@ -131,22 +127,22 @@ class Actor(basic_module.BasicModule):
         hist_obs = t.stack((hist_0,hist_1,hist_2,hist_3,hist_4,hist_5))
         batch_size = hist_obs.shape[1]
 
-        h0 = 1
-        c0 = 2
+        if test:
+            _, (hn, cn) = self.rnn(hist_obs)
+        else:
+            h0 = t.randn(1, batch_size, 256)
+            c0 = t.randn(1, batch_size, 256)
+            _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
 
-        # h0 = t.randn(1,batch_size,256)
-        # c0 = t.randn(1,batch_size,256)
-        # _,(hn,cn) = self.rnn(hist_obs,(h0,c0))
-        _, (hn, cn) = self.rnn(hist_obs)
-        s,b,h = hn.shape
+        s, b, h = hn.shape
         out = hn.contiguous().view(b,-1)
         b, _, d = poses.shape
         poses = poses.contiguous().view(b, -1)
         out = t.cat((out,poses),dim=1)
         action = self.fc(out)
 
-        desired_value = np.array([[135, 68]])
-        desired_value2 = np.array([[71, 142]])
+        # desired_value = np.array([[135, 68]])
+        # desired_value2 = np.array([[71, 142]])
         # if the same actions?
         # check networks of the values behind the action
         # check the whole state space, if the frontiers are different
@@ -161,10 +157,11 @@ class Actor(basic_module.BasicModule):
         # else:
         #     print("The variable does not have the desired value.")
 
-
-
-        # action = gumbel_softmax(action)
-        return action
+        if test:
+            return action
+        else:
+            action = gumbel_softmax(action, i_episode)
+            return action
 
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension

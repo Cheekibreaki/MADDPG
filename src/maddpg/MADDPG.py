@@ -5,7 +5,7 @@ from maddpg.memory import ReplayMemory, Experience
 from torch.optim import Adam
 import torch.nn as nn
 
-LOAD_MODEL = False
+test = False
 
 def soft_update(target, source, t):
     for target_param, source_param in zip(target.parameters(),
@@ -50,10 +50,11 @@ class MADDPG:
         self.actors_target = deepcopy(self.actors)
         self.critics_target = deepcopy(self.critics)
 
-        for x in self.actors:
-            x.eval()
-        for x in self.critics:
-            x.eval()
+        if test:
+            for x in self.actors:
+                x.eval()
+            for x in self.critics:
+                x.eval()
 
         if self.use_cuda:
             for x in self.actors:
@@ -154,7 +155,7 @@ class MADDPG:
 
         return c_loss, a_loss
 
-    def select_action(self, state_batch, pose_batch):
+    def select_action(self, state_batch, pose_batch, i_episode):
         # state_batch: n_agents x state_dim
         actions = t.zeros(
             self.n_agents,
@@ -163,7 +164,7 @@ class MADDPG:
         for i in range(self.n_agents):
             sb = state_batch[i, :].detach()
             pose_batch_i = pose_batch[i,...]
-            act = self.actors[i](sb.unsqueeze(0),pose_batch_i.unsqueeze(0)).squeeze()
+            act = self.actors[i](sb.unsqueeze(0),pose_batch_i.unsqueeze(0), i_episode).squeeze()
             act = t.clamp(act, 1e-6, 1-1e-6)
             actions[i, :] = act
         self.steps_done += 1

@@ -14,6 +14,7 @@ import yaml
 from datetime import datetime
 import glob
 
+
 def remove_files_with_prefix(directory, prefix):
     # Get a list of files matching the prefix pattern in the specified directory
     file_list = glob.glob(os.path.join(directory, f"{prefix}*"))
@@ -71,6 +72,7 @@ win = None
 param = None
 avg = None
 load_model = False
+test = False
 
 MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_07_28_14_25_59\model-2220.pth'
 CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
@@ -83,10 +85,7 @@ maddpg = MADDPG(n_agents, n_states, n_actions, n_pose, batch_size, capacity,
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 
-
-
 if load_model:
-
     print("loaded")
     checkpoints = th.load(MODEL_PATH)
     for i, actor in enumerate(maddpg.actors):
@@ -138,7 +137,7 @@ for i_episode in range(n_episode):
         if i_episode % 1 == 0 and e_render:
             world.render()
         obs_history = obs_history.type(FloatTensor)
-        action_probs = maddpg.select_action(obs_history, pose).data.cpu()
+        action_probs = maddpg.select_action(obs_history, pose, i_episode).data.cpu()
         copied_tensor = action_probs.clone()
         action_probs_valid = np.copy(copied_tensor.numpy())
         action = []
@@ -148,6 +147,7 @@ for i_episode in range(n_episode):
                 if len(frt) == 0:
                     action_probs_valid[i][j] = 0
 
+        # if test:
         for i, prob_list in enumerate(action_probs_valid):
             max_indicies = 0
             non_zero_indices = np.nonzero(prob_list)
@@ -158,12 +158,8 @@ for i_episode in range(n_episode):
                 max_indicies = np.argmax(prob_list)  # If all values are zero, return the index of the first value
 
             action.append(max_indicies)
-
-            # for j,frt in enumerate(rbt.get_frontiers()):
-            #     if len(frt) == 0:
-            #         print(action_probs_valid[i][j])
-            #         action_probs_valid[i][j] = 0
-            # action.append(categorical.Categorical(probs=th.tensor(action_probs_valid[i])).sample())
+        # else:
+        #     action.append(categorical.Categorical(probs=th.tensor(action_probs_valid[i])).sample())
 
         action = th.tensor(onehot_from_action(action))
         acts = np.argmax(action,axis=1)
