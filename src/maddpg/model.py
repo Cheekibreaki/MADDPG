@@ -25,10 +25,10 @@ class Critic(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872, self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_action*n_agent+dim_pose*n_agent*n_agent,1)
-        nn.init.xavier_uniform_(self.conv1.weight)
-        nn.init.xavier_uniform_(self.conv2.weight)
-        nn.init.xavier_uniform_(self.i2h1.weight)
-        nn.init.xavier_uniform_(self.fc.weight)
+        # nn.init.xavier_uniform_(self.conv1.weight)
+        # nn.init.xavier_uniform_(self.conv2.weight)
+        # nn.init.xavier_uniform_(self.i2h1.weight)
+        # nn.init.xavier_uniform_(self.fc.weight)
 
 
     # obs: batch_size * obs_dim
@@ -96,10 +96,10 @@ class Actor(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872,self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_pose*n_agent,8)
-        nn.init.xavier_uniform_(self.conv1.weight)
-        nn.init.xavier_uniform_(self.conv2.weight)
-        nn.init.xavier_uniform_(self.i2h1.weight)
-        nn.init.xavier_uniform_(self.fc.weight)
+        # nn.init.xavier_uniform_(self.conv1.weight)
+        # nn.init.xavier_uniform_(self.conv2.weight)
+        # nn.init.xavier_uniform_(self.i2h1.weight)
+        # nn.init.xavier_uniform_(self.fc.weight)
         # self.fc = nn.Linear(self.hidden_dim, 8)
 
     def forward(self, obs, poses):
@@ -150,11 +150,11 @@ class Actor(basic_module.BasicModule):
         # if the same actions?
         # check networks of the values behind the action
         # check the whole state space, if the frontiers are different
-        print(poses)
-        if np.array_equal(poses, desired_value):
-            print("The variable has the desired value.")
-        else:
-            print("The variable does not have the desired value.")
+        # print(poses)
+        # if np.array_equal(poses, desired_value):
+        #     print("The variable has the desired value.")
+        # else:
+        #     print("The variable does not have the desired value.")
 
         # if np.array_equal(poses, desired_value2):
         #     print("The variable has the desired value.")
