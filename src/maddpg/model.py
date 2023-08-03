@@ -4,12 +4,17 @@ import torch.nn.functional as F
 import numpy as np
 from sim_utils import gumbel_softmax
 
+t.manual_seed(1234)
+
+
 from maddpg import basic_module
 
 class Critic(basic_module.BasicModule):
-    def __init__(self, n_agent, dim_observation, dim_action, dim_pose):
-        super(Critic, self).__init__()
 
+    def __init__(self, n_agent, dim_observation, dim_action, dim_pose):
+        print("init critic")
+        super(Critic, self).__init__()
+        t.manual_seed(0)
         # RMADDPG
         self.hidden_dim = 256
         self.n_agent = n_agent
@@ -20,6 +25,10 @@ class Critic(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872, self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_action*n_agent+dim_pose*n_agent*n_agent,1)
+        nn.init.xavier_uniform_(self.conv1.weight)
+        nn.init.xavier_uniform_(self.conv2.weight)
+        nn.init.xavier_uniform_(self.i2h1.weight)
+        nn.init.xavier_uniform_(self.fc.weight)
 
 
     # obs: batch_size * obs_dim
@@ -50,9 +59,10 @@ class Critic(basic_module.BasicModule):
         hist_obs = t.stack((hist_0, hist_1, hist_2, hist_3, hist_4, hist_5))
         # hist_obs = t.stack((hist_0, hist_1, hist_2))
         batch_size = hist_obs.shape[1]
-        h0 = t.randn(1, batch_size, 256)
-        c0 = t.randn(1, batch_size, 256)
-        _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
+        # h0 = t.randn(1, batch_size, 256)
+        # c0 = t.randn(1, batch_size, 256)
+        _, (hn, cn) = self.rnn(hist_obs)
+        # _, (hn, cn) = self.rnn(hist_obs, (h0, c0))
         s, b, h = hn.shape
         out = hn.contiguous().view(b,-1)
         b,n,d = acts.shape
@@ -73,8 +83,11 @@ class Critic(basic_module.BasicModule):
 
 
 class Actor(basic_module.BasicModule):
+
     def __init__(self, n_agent, dim_pose):
         super(Actor, self).__init__()
+        print("init actor")
+        t.manual_seed(0)
         # RNN
         self.hidden_dim = 256
         out_dim = 8
@@ -83,6 +96,10 @@ class Actor(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872,self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_pose*n_agent,8)
+        nn.init.xavier_uniform_(self.conv1.weight)
+        nn.init.xavier_uniform_(self.conv2.weight)
+        nn.init.xavier_uniform_(self.i2h1.weight)
+        nn.init.xavier_uniform_(self.fc.weight)
         # self.fc = nn.Linear(self.hidden_dim, 8)
 
     def forward(self, obs, poses):
@@ -113,16 +130,40 @@ class Actor(basic_module.BasicModule):
 
         hist_obs = t.stack((hist_0,hist_1,hist_2,hist_3,hist_4,hist_5))
         batch_size = hist_obs.shape[1]
-        h0 = t.randn(1,batch_size,256)
-        c0 = t.randn(1,batch_size,256)
-        _,(hn,cn) = self.rnn(hist_obs,(h0,c0))
+
+        h0 = 1
+        c0 = 2
+
+        # h0 = t.randn(1,batch_size,256)
+        # c0 = t.randn(1,batch_size,256)
+        # _,(hn,cn) = self.rnn(hist_obs,(h0,c0))
+        _, (hn, cn) = self.rnn(hist_obs)
         s,b,h = hn.shape
         out = hn.contiguous().view(b,-1)
         b, _, d = poses.shape
         poses = poses.contiguous().view(b, -1)
         out = t.cat((out,poses),dim=1)
         action = self.fc(out)
-        action = gumbel_softmax(action)
+
+        desired_value = np.array([[135, 68]])
+        desired_value2 = np.array([[71, 142]])
+        # if the same actions?
+        # check networks of the values behind the action
+        # check the whole state space, if the frontiers are different
+        print(poses)
+        if np.array_equal(poses, desired_value):
+            print("The variable has the desired value.")
+        else:
+            print("The variable does not have the desired value.")
+
+        # if np.array_equal(poses, desired_value2):
+        #     print("The variable has the desired value.")
+        # else:
+        #     print("The variable does not have the desired value.")
+
+
+
+        # action = gumbel_softmax(action)
         return action
 
     def num_flat_features(self, x):

@@ -45,10 +45,15 @@ class MADDPG:
         self.critic_optimizer = [Adam(x.parameters(),
                                       lr=0.001) for x in self.critics]
         self.actor_optimizer = [Adam(x.parameters(),
-                                     lr=0.001) for x in self.actors]    # lr = 0.0001
+                                     lr=0.0001) for x in self.actors]    # lr = 0.0001
 
         self.actors_target = deepcopy(self.actors)
         self.critics_target = deepcopy(self.critics)
+
+        for x in self.actors:
+            x.eval()
+        for x in self.critics:
+            x.eval()
 
         if self.use_cuda:
             for x in self.actors:
