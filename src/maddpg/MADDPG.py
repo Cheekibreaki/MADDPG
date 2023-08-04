@@ -7,7 +7,7 @@ from torch.optim import Adam
 import torch.nn as nn
 import yaml
 
-CONFIG_PATH = os.getcwd()+'/../assets/config.ymal'
+CONFIG_PATH = os.getcwd()+'/../assets/config.yaml'
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 test = config['test']

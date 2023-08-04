@@ -8,7 +8,7 @@ from maddpg import basic_module
 import yaml
 t.manual_seed(1234)
 
-CONFIG_PATH = os.getcwd()+'/../assets/config.ymal'
+CONFIG_PATH = os.getcwd()+'/../assets/config.yaml'
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 

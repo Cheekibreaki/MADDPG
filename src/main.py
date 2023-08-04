@@ -39,6 +39,10 @@ writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
 num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
 num_step_file.close()
 
+CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+with open(CONFIG_PATH,'r') as stream:
+    config = yaml.safe_load(stream)
+
 food_reward = 10.
 poison_reward = -1.
 encounter_reward = 0.01
@@ -57,33 +61,35 @@ n_pose = 2
 capacity = 5000
 # batch_size = 1000
 batch_size = 400
-
+batch_size = config['batch_size']
 n_episode = 3000
+n_episode = config['n_episode']
 # max_steps = 1000
 max_steps = 50
 # episodes_before_train = 1000
 episodes_before_train = 400
-
+episodes_before_train = config['episodes_before_train']
 model_save_eps = 30
+model_save_eps = config['model_save_eps']
 
 highest_total_reward = float('-inf')
 
 win = None
 param = None
 avg = None
-load_model = False
-test = False
+
+load_model = config['load_model']
+test = config['test']
 
 MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
-CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+
 current_time = datetime.now()
 time_string = current_time.strftime('%Y_%m_%d_%H_%M_%S')
 MODEL_DIR = os.getcwd() + '/../model/' + time_string
 
 maddpg = MADDPG(n_agents, n_states, n_actions, n_pose, batch_size, capacity,
                 episodes_before_train)
-with open(CONFIG_PATH,'r') as stream:
-    config = yaml.safe_load(stream)
+
 
 if load_model:
     print("loaded")
