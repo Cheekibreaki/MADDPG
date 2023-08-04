@@ -5,7 +5,7 @@ import numpy as np
 from sim_utils import gumbel_softmax
 from maddpg import basic_module
 t.manual_seed(1234)
-test = True
+test = False
 
 
 class Critic(basic_module.BasicModule):

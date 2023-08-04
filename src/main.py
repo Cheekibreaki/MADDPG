@@ -72,7 +72,7 @@ win = None
 param = None
 avg = None
 load_model = False
-test = True
+test = False
 
 MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
 CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'

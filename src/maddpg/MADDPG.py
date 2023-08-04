@@ -5,7 +5,7 @@ from maddpg.memory import ReplayMemory, Experience
 from torch.optim import Adam
 import torch.nn as nn
 
-test = True
+test = False
 
 def soft_update(target, source, t):
     for target_param, source_param in zip(target.parameters(),
