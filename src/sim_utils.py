@@ -127,9 +127,9 @@ def gumbel_softmax(logits, i_episode, temperature=1.0, hard=False):
             raise ValueError("The version of beta decay is not matched with current implementation.")
         return decayed_beta
     if test:
-        temperature = get_decayed_beta(temperature, i_episode, "exponential")
-    else:
         temperature = config['temperature']
+    else:
+        temperature = get_decayed_beta(temperature, i_episode, "exponential")
 
     y = gumbel_softmax_sample(logits, temperature)
     if hard:
