@@ -196,8 +196,8 @@ class Robot():
 
     def reward(self, counter, incrmnt_his):
         """reward function"""
-        rwd1 = np.sum(incrmnt_his) * self.config['robots']['w2']
-        rwd2 = -1. * counter * self.config['robots']['w1']
+        rwd1 = np.sum(incrmnt_his) * self.config['robots']['w1']
+        rwd2 = -1. * counter * self.config['robots']['w2']
         # done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(
         #     self.maze == self.config['color']['free']) > 0.95
         # if done:
