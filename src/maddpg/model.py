@@ -1,11 +1,18 @@
+import os
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from sim_utils import gumbel_softmax
 from maddpg import basic_module
+import yaml
 t.manual_seed(1234)
-test = False
+
+CONFIG_PATH = os.getcwd()+'/../assets/config.ymal'
+with open(CONFIG_PATH,'r') as stream:
+    config = yaml.safe_load(stream)
+
+test = config['test']
 
 
 class Critic(basic_module.BasicModule):

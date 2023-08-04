@@ -1,11 +1,17 @@
+import os
 from maddpg.model import Critic, Actor
 import torch as t
 from copy import deepcopy
 from maddpg.memory import ReplayMemory, Experience
 from torch.optim import Adam
 import torch.nn as nn
+import yaml
 
-test = False
+CONFIG_PATH = os.getcwd()+'/../assets/config.ymal'
+with open(CONFIG_PATH,'r') as stream:
+    config = yaml.safe_load(stream)
+test = config['test']
+
 
 def soft_update(target, source, t):
     for target_param, source_param in zip(target.parameters(),

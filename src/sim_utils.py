@@ -6,8 +6,13 @@ from torch.autograd import Variable
 import numpy as np
 import json
 import cv2
+import yaml
 
 CONFIG_PATH = os.getcwd()+'/../assets/config.ymal'
+with open(CONFIG_PATH,'r') as stream:
+    config = yaml.safe_load(stream)
+
+test = config['test']
 
 def within_bound(p,shape,r=0):
     """ check if point p [y;x] or [y;x;theta] with radius r is inside world of shape (h,w)
@@ -121,7 +126,10 @@ def gumbel_softmax(logits, i_episode, temperature=1.0, hard=False):
         else:
             raise ValueError("The version of beta decay is not matched with current implementation.")
         return decayed_beta
-    temperature = get_decayed_beta(temperature, i_episode, "exponential")
+    if test:
+        temperature = get_decayed_beta(temperature, i_episode, "exponential")
+    else:
+        temperature = config['temperature']
 
     y = gumbel_softmax_sample(logits, temperature)
     if hard:
