@@ -14,6 +14,7 @@ import yaml
 from datetime import datetime
 import glob
 
+
 def remove_files_with_prefix(directory, prefix):
     # Get a list of files matching the prefix pattern in the specified directory
     file_list = glob.glob(os.path.join(directory, f"{prefix}*"))
@@ -71,8 +72,9 @@ win = None
 param = None
 avg = None
 load_model = False
+test = True
 
-MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_07_28_14_25_59\model-2220.pth'
+MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
 CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
 current_time = datetime.now()
 time_string = current_time.strftime('%Y_%m_%d_%H_%M_%S')
@@ -83,10 +85,7 @@ maddpg = MADDPG(n_agents, n_states, n_actions, n_pose, batch_size, capacity,
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 
-
-
 if load_model:
-
     print("loaded")
     checkpoints = th.load(MODEL_PATH)
     for i, actor in enumerate(maddpg.actors):
@@ -106,11 +105,6 @@ prev_critic = None
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
 for i_episode in range(n_episode):
-
-    print("new step")
-
-
-    # print("started 1")
     try:
         obs,pose = world.reset(random=True)
         pose = th.tensor(pose)
@@ -143,7 +137,7 @@ for i_episode in range(n_episode):
         if i_episode % 1 == 0 and e_render:
             world.render()
         obs_history = obs_history.type(FloatTensor)
-        action_probs = maddpg.select_action(obs_history, pose).data.cpu()
+        action_probs = maddpg.select_action(obs_history, pose, i_episode).data.cpu()
         copied_tensor = action_probs.clone()
         action_probs_valid = np.copy(copied_tensor.numpy())
         action = []
@@ -211,8 +205,7 @@ for i_episode in range(n_episode):
         maddpg.memory.push(obs_history, action, next_obs_history, reward, pose, next_pose)
         obs_history = next_obs_history
         pose = next_pose
-        if t % 5 == 0:
-            # print("update policy")
+        if t % 10 == 0:
             c_loss, a_loss = maddpg.update_policy()
             # print("update policy end")
         if done:
@@ -223,11 +216,12 @@ for i_episode in range(n_episode):
     num_step_file.write("eps: " + str(i_episode) + " #reward: " + str(total_reward) + "\n")
     num_step_file.close()
 
+    # if not discard:
     maddpg.episode_done += 1
-    
+
     if total_reward>highest_total_reward:
         highest_total_reward = total_reward
-        
+
         remove_files_with_prefix(MODEL_DIR,'highest_model')
         print('Save highest Models......')
         if not os.path.exists(MODEL_DIR):
@@ -240,15 +234,14 @@ for i_episode in range(n_episode):
             dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
             dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
         th.save(dicts, MODEL_DIR + '/highest_model-%d.pth' % (maddpg.episode_done))
-    
+
     # if not discard:
-    
+
     if maddpg.episode_done % model_save_eps == 0:
         print('Save Models......')
         if not os.path.exists(MODEL_DIR):
             os.makedirs(MODEL_DIR)
         dicts = {}
-
         for i in range(maddpg.n_agents):
             dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
             dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
