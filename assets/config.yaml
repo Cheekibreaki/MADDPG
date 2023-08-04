@@ -7,6 +7,17 @@ map_id_eval_set: /../assets/map_id_1.txt
 # [GC,LC,NC]
 comm_mode: NC
 
+# model-related hyperparam
+test: False
+load_model: False
+MODEL_PATH: r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
+batch_size: 400
+n_episode: 3000
+max_steps: 50
+episodes_before_train: 400
+model_save_eps: 30
+temperature: 1.0
+
 # robots settings
 robots:
   number: 1
