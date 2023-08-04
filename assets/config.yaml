@@ -9,13 +9,14 @@ comm_mode: NC
 
 # model-related hyperparam
 test: False
+e_render : False
 load_model: False
 MODEL_PATH: r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
-batch_size: 400
+batch_size: 20
 n_episode: 3000
 max_steps: 50
-episodes_before_train: 400
-model_save_eps: 30
+episodes_before_train: 20
+model_save_eps: 10
 temperature: 1.0
 
 # robots settings
@@ -24,10 +25,10 @@ robots:
   robotRadius: 3
   commRange: 60
   syncRange: 20
+  resetRandomPose: 0
   startPose:
-    x: 0
-    y: 0
-  resetRandomPose: 1
+    x: 61
+    y: 61
   w1: 0.00002
   w2: 0.001
 #  w1: 1

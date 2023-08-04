@@ -30,7 +30,7 @@ def remove_files_with_prefix(directory, prefix):
 
 print(th.cuda.is_available())
 # do not render the scene
-e_render = True
+4
 # tensorboard writer
 time_now = time.strftime("%m%d_%H%M%S")
 
@@ -57,22 +57,23 @@ n_agents = world.number
 n_states = world.number
 n_actions = 8
 n_pose = 2
+e_render = config['e_render']
 # capacity = 1000000
 capacity = 5000
 # batch_size = 1000
-batch_size = 400
+
 batch_size = config['batch_size']
-n_episode = 3000
+
 n_episode = config['n_episode']
 # max_steps = 1000
 max_steps = 50
 # episodes_before_train = 1000
-episodes_before_train = 400
+
 episodes_before_train = config['episodes_before_train']
-model_save_eps = 30
+
 model_save_eps = config['model_save_eps']
 
-highest_total_reward = float('-inf')
+lowest_step = float('+inf')
 
 win = None
 param = None
@@ -81,7 +82,7 @@ avg = None
 load_model = config['load_model']
 test = config['test']
 
-MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
+MODEL_PATH = config['MODEL_PATH']
 
 current_time = datetime.now()
 time_string = current_time.strftime('%Y_%m_%d_%H_%M_%S')
@@ -225,11 +226,11 @@ for i_episode in range(n_episode):
     # if not discard:
     maddpg.episode_done += 1
 
-    if total_reward>highest_total_reward:
-        highest_total_reward = total_reward
+    if (num_steps <= lowest_step):
+        lowest_step = num_steps
 
-        remove_files_with_prefix(MODEL_DIR,'highest_model')
-        print('Save highest Models......')
+        remove_files_with_prefix(MODEL_DIR,'lowest_step')
+        print('Save Models with lowest_step......')
         if not os.path.exists(MODEL_DIR):
             os.makedirs(MODEL_DIR)
         dicts = {}
@@ -239,7 +240,7 @@ for i_episode in range(n_episode):
             dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
             dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
             dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
-        th.save(dicts, MODEL_DIR + '/highest_model-%d.pth' % (maddpg.episode_done))
+        th.save(dicts, MODEL_DIR + '/lowest_step-%d.pth' % (maddpg.episode_done))
 
     # if not discard:
 
