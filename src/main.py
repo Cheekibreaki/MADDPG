@@ -71,10 +71,10 @@ highest_total_reward = float('-inf')
 win = None
 param = None
 avg = None
-load_model = False
-test = False
+load_model = True
+test = True
 
-MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_07_28_14_25_59\model-2220.pth'
+MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
 CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
 current_time = datetime.now()
 time_string = current_time.strftime('%Y_%m_%d_%H_%M_%S')

@@ -5,7 +5,7 @@ import numpy as np
 from sim_utils import gumbel_softmax
 from maddpg import basic_module
 t.manual_seed(1234)
-test = False
+test = True
 
 
 class Critic(basic_module.BasicModule):
@@ -23,10 +23,10 @@ class Critic(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872, self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_action*n_agent+dim_pose*n_agent*n_agent,1)
-        # nn.init.xavier_uniform_(self.conv1.weight)
-        # nn.init.xavier_uniform_(self.conv2.weight)
-        # nn.init.xavier_uniform_(self.i2h1.weight)
-        # nn.init.xavier_uniform_(self.fc.weight)
+        nn.init.xavier_uniform_(self.conv1.weight)
+        nn.init.xavier_uniform_(self.conv2.weight)
+        nn.init.xavier_uniform_(self.i2h1.weight)
+        nn.init.xavier_uniform_(self.fc.weight)
 
     # obs: batch_size * obs_dim
     def forward(self, obs, acts, poses):
@@ -92,10 +92,10 @@ class Actor(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872,self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_pose*n_agent,8)
-        # nn.init.xavier_uniform_(self.conv1.weight)
-        # nn.init.xavier_uniform_(self.conv2.weight)
-        # nn.init.xavier_uniform_(self.i2h1.weight)
-        # nn.init.xavier_uniform_(self.fc.weight)
+        nn.init.xavier_uniform_(self.conv1.weight)
+        nn.init.xavier_uniform_(self.conv2.weight)
+        nn.init.xavier_uniform_(self.i2h1.weight)
+        nn.init.xavier_uniform_(self.fc.weight)
         # self.fc = nn.Linear(self.hidden_dim, 8)
 
     def forward(self, obs, poses, i_episode):

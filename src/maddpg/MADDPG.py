@@ -5,7 +5,7 @@ from maddpg.memory import ReplayMemory, Experience
 from torch.optim import Adam
 import torch.nn as nn
 
-test = False
+test = True
 
 def soft_update(target, source, t):
     for target_param, source_param in zip(target.parameters(),
@@ -109,7 +109,7 @@ class MADDPG:
             current_Q = self.critics[agent](whole_state,whole_action,whole_pose)
 
             non_final_next_actions = [
-                self.actors_target[i](non_final_next_states[:,i,:],non_final_next_poses[:,i,:]) for i in range(self.n_agents)
+                self.actors_target[i](non_final_next_states[:,i,:],non_final_next_poses[:,i,:],self.episode_done) for i in range(self.n_agents)
             ]
             non_final_next_actions = t.stack(non_final_next_actions)
             non_final_next_actions = (non_final_next_actions.transpose(0,1).contiguous())
@@ -133,7 +133,7 @@ class MADDPG:
             self.actor_optimizer[agent].zero_grad()
             state_i = state_batch[:, agent, :]
             pose_i = pose_batch[:, agent, :]
-            action_i = self.actors[agent](state_i,pose_i)
+            action_i = self.actors[agent](state_i,pose_i,self.episode_done)
             ac = action_batch.clone()
             ac[:, agent, :] = action_i
             whole_action = ac.view(self.batch_size, self.n_agents ,-1)
