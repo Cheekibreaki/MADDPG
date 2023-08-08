@@ -9,11 +9,11 @@ comm_mode: NC
 
 # model-related hyperparam
 test: False
-e_render : False
+e_render : True
 load_model: False
-MODEL_PATH: r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
+MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_16_49_53\model-470.pth'
 batch_size: 20
-n_episode: 3000
+n_episode: 300
 max_steps: 50
 episodes_before_train: 20
 model_save_eps: 10
