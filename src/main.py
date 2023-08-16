@@ -13,6 +13,8 @@ import os
 import yaml
 from datetime import datetime
 import glob
+import re
+import matplotlib.pyplot as plt
 
 
 def remove_files_with_prefix(directory, prefix):
@@ -274,5 +276,30 @@ for i_episode in range(n_episode):
     maddpg.episode_done += 1
     if maddpg.episode_done == maddpg.episodes_before_train:
         print('training now begins...')
+
+# Read the episode data from the text file
+with open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "r") as file:
+    text = file.read()
+
+# Define regular expressions to match episode and total_counter lines
+episode_pattern = r'eps: (\d+) #total_counter: (\d+)'
+
+# Find all episode and total_counter matches
+matches = re.findall(episode_pattern, text)
+
+counter_n = []
+# Extract and print episode number and total_counter
+for episode, total_counter in matches:
+    print(f"Episode: {episode}, Total Counter: {total_counter}")
+    counter_n.append(int(total_counter))
+print("counter_n for all episode:", counter_n)
+
+plt.plot(counter_n, color='magenta', marker='o', mfc='pink')
+plt.xticks(range(0, len(counter_n) + 1, 1))
+
+plt.ylabel('# of total grid travelled')
+plt.xlabel('# of episode')
+plt.title("Grid travelled for each episode")
+plt.show()
 
 world.close()
