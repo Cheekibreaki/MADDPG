@@ -169,7 +169,7 @@ class Robot():
         done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(
             self.maze == self.config['color']['free']) > 0.95
         info = 'Robot %d has moved to the target point' % (self.id)
-        return obs, rwd, done, info
+        return obs, rwd, done, info, counter
 
     def move_to_target(self, target):
         """

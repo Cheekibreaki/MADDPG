@@ -140,6 +140,7 @@ class RobotExplorationT1(gym.Env):
         rwd_n = []
         info_n = []
         pose_n = []
+        counter_n = []
         for i, rbt in enumerate(self.robots):
             if action_n[i] == -1:
                 # NOOP
@@ -147,7 +148,7 @@ class RobotExplorationT1(gym.Env):
                 rwd = -2
                 info = 'NOOP'
             else:
-                obs, rwd, done, info = rbt.step(action_n[i])
+                obs, rwd, done, info, counter = rbt.step(action_n[i])
             obs_n.append(cv2.resize(obs,(100,100),interpolation=cv2.INTER_NEAREST))
             rwd_n.append(rwd)
             info_n.append(info)
@@ -155,6 +156,7 @@ class RobotExplorationT1(gym.Env):
             pose[:, 2 * i] = rbt.pose[0]
             pose[:, 2 * i + 1] = rbt.pose[1]
             pose_n.append(pose)
+            counter_n.append(counter)
         self._merge_map()
         if self.config['comm_mode'] == 'NC':
             # no communication
@@ -184,7 +186,7 @@ class RobotExplorationT1(gym.Env):
         done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(self.maze == self.config['color']['free']) > 0.95
         #if done:
             #self.track()
-        return obs_n,rwd_n,done,info_n,pose_n
+        return obs_n,rwd_n,done,info_n,pose_n, counter_n
 
     def move_to_targets(self):
         """
