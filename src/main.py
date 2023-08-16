@@ -30,7 +30,7 @@ def remove_files_with_prefix(directory, prefix):
 
 print(th.cuda.is_available())
 # do not render the scene
-e_render = True
+
 # tensorboard writer
 time_now = time.strftime("%m%d_%H%M%S")
 
@@ -38,6 +38,10 @@ writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
 
 num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
 num_step_file.close()
+
+CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+with open(CONFIG_PATH,'r') as stream:
+    config = yaml.safe_load(stream)
 
 food_reward = 10.
 poison_reward = -1.
@@ -53,37 +57,41 @@ n_agents = world.number
 n_states = world.number
 n_actions = 8
 n_pose = 2
+e_render = config['e_render']
 # capacity = 1000000
 capacity = 5000
 # batch_size = 1000
-batch_size = 400
 
-n_episode = 3000
+batch_size = config['batch_size']
+
+n_episode = config['n_episode']
 # max_steps = 1000
 max_steps = 50
 # episodes_before_train = 1000
 episodes_before_train = 400
 
-model_save_eps = 30
+episodes_before_train = config['episodes_before_train']
 
-highest_total_reward = float('-inf')
+model_save_eps = config['model_save_eps']
+
+lowest_step = float('+inf')
 
 win = None
 param = None
 avg = None
-load_model = True
-test = True
 
-MODEL_PATH = r'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_04_01_51_11\model-1350.pth'
-CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+load_model = config['load_model']
+test = config['test']
+
+MODEL_PATH = config['MODEL_PATH']
+
 current_time = datetime.now()
 time_string = current_time.strftime('%Y_%m_%d_%H_%M_%S')
 MODEL_DIR = os.getcwd() + '/../model/' + time_string
 
 maddpg = MADDPG(n_agents, n_states, n_actions, n_pose, batch_size, capacity,
                 episodes_before_train)
-with open(CONFIG_PATH,'r') as stream:
-    config = yaml.safe_load(stream)
+
 
 if load_model:
     print("loaded")
@@ -207,14 +215,13 @@ for i_episode in range(n_episode):
     num_step_file.write("eps: " + str(i_episode) + " #reward: " + str(total_reward) + "\n")
     num_step_file.close()
 
-    # if not discard:
-    maddpg.episode_done += 1
 
-    if total_reward>highest_total_reward:
-        highest_total_reward = total_reward
 
-        remove_files_with_prefix(MODEL_DIR,'highest_model')
-        print('Save highest Models......')
+    if (num_steps <= lowest_step):
+        lowest_step = num_steps
+
+        remove_files_with_prefix(MODEL_DIR,'lowest_step')
+        print('Save Models with lowest_step......')
         if not os.path.exists(MODEL_DIR):
             os.makedirs(MODEL_DIR)
         dicts = {}
@@ -224,7 +231,7 @@ for i_episode in range(n_episode):
             dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
             dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
             dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
-        th.save(dicts, MODEL_DIR + '/highest_model-%d.pth' % (maddpg.episode_done))
+        th.save(dicts, MODEL_DIR + '/lowest_step-%d.pth' % (maddpg.episode_done))
 
     # if not discard:
 
@@ -250,7 +257,8 @@ for i_episode in range(n_episode):
         writer.add_scalars('loss/c_loss',{'r0':c_loss[0],'r1':c_loss[1]},i_episode)
     if not a_loss is None:
         writer.add_scalars('loss/a_loss',{'r0':a_loss[0],'r1':a_loss[1]},i_episode)
-
+    # if not discard:
+    maddpg.episode_done += 1
     if maddpg.episode_done == maddpg.episodes_before_train:
         print('training now begins...')
 

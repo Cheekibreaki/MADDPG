@@ -1,14 +1,22 @@
+import os
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from sim_utils import gumbel_softmax
 from maddpg import basic_module
+import yaml
 t.manual_seed(1234)
-test = True
+
+CONFIG_PATH = os.getcwd()+'/../assets/config.yaml'
+with open(CONFIG_PATH,'r') as stream:
+    config = yaml.safe_load(stream)
+
+test = config['test']
 
 
 class Critic(basic_module.BasicModule):
+
     def __init__(self, n_agent, dim_observation, dim_action, dim_pose):
         print("init critic")
         super(Critic, self).__init__()
@@ -23,10 +31,11 @@ class Critic(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872, self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_action*n_agent+dim_pose*n_agent*n_agent,1)
-        nn.init.xavier_uniform_(self.conv1.weight)
-        nn.init.xavier_uniform_(self.conv2.weight)
-        nn.init.xavier_uniform_(self.i2h1.weight)
-        nn.init.xavier_uniform_(self.fc.weight)
+        # nn.init.xavier_uniform_(self.conv1.weight)
+        # nn.init.xavier_uniform_(self.conv2.weight)
+        # nn.init.xavier_uniform_(self.i2h1.weight)
+        # nn.init.xavier_uniform_(self.fc.weight)
+
 
     # obs: batch_size * obs_dim
     def forward(self, obs, acts, poses):
@@ -51,6 +60,7 @@ class Critic(basic_module.BasicModule):
         hist_4 = hist_4.contiguous().view(-1, self.num_flat_features(hist_4))
         hist_5 = F.relu(self.conv2(F.relu(self.conv1(obs_5))))
         hist_5 = hist_5.contiguous().view(-1, self.num_flat_features(hist_5))
+
 
         hist_obs = t.stack((hist_0, hist_1, hist_2, hist_3, hist_4, hist_5))
         # hist_obs = t.stack((hist_0, hist_1, hist_2))
@@ -92,10 +102,10 @@ class Actor(basic_module.BasicModule):
         self.i2h1 = nn.Linear(4128,self.hidden_dim)
         self.rnn = nn.LSTM(3872,self.hidden_dim)
         self.fc = nn.Linear(self.hidden_dim+dim_pose*n_agent,8)
-        nn.init.xavier_uniform_(self.conv1.weight)
-        nn.init.xavier_uniform_(self.conv2.weight)
-        nn.init.xavier_uniform_(self.i2h1.weight)
-        nn.init.xavier_uniform_(self.fc.weight)
+        # nn.init.xavier_uniform_(self.conv1.weight)
+        # nn.init.xavier_uniform_(self.conv2.weight)
+        # nn.init.xavier_uniform_(self.i2h1.weight)
+        # nn.init.xavier_uniform_(self.fc.weight)
         # self.fc = nn.Linear(self.hidden_dim, 8)
 
     def forward(self, obs, poses, i_episode):

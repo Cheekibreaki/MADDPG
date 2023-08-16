@@ -5,7 +5,19 @@ map_id_train_set: /../assets/map_id_1.txt
 map_id_eval_set: /../assets/map_id_1.txt
 
 # [GC,LC,NC]
-comm_mode: GC
+comm_mode: NC
+
+# model-related hyperparam
+test: False
+e_render : True
+load_model: False
+MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_08_12_02_47\model-200.pth'
+batch_size: 20
+n_episode: 300
+max_steps: 50
+episodes_before_train: 20
+model_save_eps: 10
+temperature: 1.0
 
 # robots settings
 robots:
@@ -13,10 +25,10 @@ robots:
   robotRadius: 3
   commRange: 60
   syncRange: 20
+  resetRandomPose: 0
   startPose:
-    x: 0
-    y: 0
-  resetRandomPose: 1
+    x: 61
+    y: 61
   w1: 0.00002
   w2: 0.001
   w3: 0.1
@@ -29,7 +41,7 @@ robots:
 
 # sensor settings
 laser:
-  range: 40
+  range: 20
   fov: 360
   resolution: 0.1
 
