@@ -51,10 +51,11 @@ class RobotExplorationT1(gym.Env):
         self.track_map = np.copy(self.maze)
         self.data_transmitted = 0
         self.robots = [Robot(i, np.copy(self.maze)) for i in range(self.number)]
-        for rbt in self.robots:
+        for i,rbt in enumerate(self.robots):
+            robot_id = "robot" + str(i + 1)
             rbt.robot_list=self.robots
             rbt.world = self
-            rbt.reset(np.copy(self.maze))
+            rbt.reset(np.copy(self.maze),robot_id)
         self._merge_map()
         obs_n = []
         pose_n = []
