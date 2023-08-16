@@ -9,7 +9,7 @@ comm_mode: NC
 
 # model-related hyperparam
 test: False
-e_render : True
+e_render : False
 load_model: False
 MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_08_12_02_47\model-200.pth'
 batch_size: 20
@@ -41,7 +41,7 @@ robots:
 
 # sensor settings
 laser:
-  range: 20
+  range: 40
   fov: 360
   resolution: 0.1
 

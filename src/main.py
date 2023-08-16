@@ -130,6 +130,10 @@ for i_episode in range(n_episode):
     for i in range(n_agents):
         obs_history[i] = np.vstack((obs_t_minus_0[i],obs_t_minus_1[i],obs_t_minus_2[i],
                             obs_t_minus_3[i],obs_t_minus_4[i],obs_t_minus_5[i]))
+    counter_obs = []
+    for i in range(n_agents):
+        counter_obs.append(0)
+        print("counter_obs init:", counter_obs)
 
     if isinstance(obs, np.ndarray):
         obs_history = th.from_numpy(obs_history).float()
@@ -176,7 +180,11 @@ for i_episode in range(n_episode):
                 # NOOP 指令
                 acts[i] = -1
 
-        obs_, reward, done, _, next_pose = world.step(acts)
+        obs_, reward, done, _, next_pose, counter = world.step(acts)
+        for i in range(n_agents):
+            counter_obs[i] = counter_obs[i] + counter[i]
+        # print("counter_obs_after_run:", counter_obs)
+
         next_pose = th.tensor(next_pose)
         reward = th.FloatTensor(reward).type(FloatTensor)
         obs_ = np.stack(obs_)
@@ -213,6 +221,11 @@ for i_episode in range(n_episode):
     num_step_file = open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "a")
     num_step_file.write("eps: " + str(i_episode) + " #step: " + str(num_steps) + "\n")
     num_step_file.write("eps: " + str(i_episode) + " #reward: " + str(total_reward) + "\n")
+    total_counter = sum(counter_obs)
+    for i in range(n_agents):
+        num_step_file.write("eps: " + str(i_episode) + " step for robot " + str(i) + ": " +
+                            str(counter_obs[i]) + "\n")
+    num_step_file.write("eps: " + str(i_episode) + " #total_counter: " + str(total_counter) + "\n")
     num_step_file.close()
 
 
