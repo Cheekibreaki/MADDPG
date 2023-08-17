@@ -14,15 +14,16 @@ class Robot():
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
         self.id = rbt_id
         self.maze = maze
-        self.robot_radius = self.config['robots']['robotRadius']
-        self.comm_range = self.config['robots']['commRange']
-        self.sync_range = self.config['robots']['syncRange']
-        self.laser_range = self.config['laser']['range']
-        self.laser_fov = self.config['laser']['fov']
-        self.laser_resol = self.config['laser']['resolution']
+        robot_id = "robot"+str(rbt_id+1)
+        self.robot_radius = self.config['robots'][robot_id]['robotRadius']
+        self.comm_range = self.config['robots'][robot_id]['commRange']
+        self.sync_range = self.config['robots'][robot_id]['syncRange']
+        self.laser_range = self.config['robots'][robot_id]['laser']['range']
+        self.laser_fov = self.config['robots'][robot_id]['laser']['fov']
+        self.laser_resol = self.config['robots'][robot_id]['laser']['resolution']
         self.state_size = (self.config['stateSize']['y'], self.config['stateSize']['x'])
         self.slam_map = np.ones_like(self.maze) * self.config['color']['uncertain']
-        self.pose = self._init_pose()
+        self.pose = self._init_pose(robot_id)
         self.last_map = self.slam_map.copy()
         self.navigator = AStar()
         self.robot_list = None
@@ -39,8 +40,8 @@ class Robot():
         self._angles_vect = angles_vect.reshape(angles_vect.shape[0], 1)
         # generate angles vector from -laser_angle/2 to laser_angle
 
-    def _init_pose(self):
-        if self.config['robots']['resetRandomPose'] == 1:
+    def _init_pose(self,robot_id):
+        if self.config['robots'][robot_id]['resetRandomPose'] == 1:
             h, w = self.maze.shape
             y_min, y_max = int(0.1 * h), int(0.8 * h)
             x_min, x_max = int(0.1 * w), int(0.8 * w)
@@ -55,11 +56,11 @@ class Robot():
                 # x = x+1
             return y, x
         else:
-            return self.config['robots']['startPose']['y'], self.config['robots']['startPose']['x']
+            return self.config['robots'][robot_id]['startPose']['y'], self.config['robots'][robot_id]['startPose']['x']
 
-    def reset(self, maze):
+    def reset(self, maze,robot_id):
         self.maze = maze
-        self.pose = self._init_pose()
+        self.pose = self._init_pose(robot_id)
         self.slam_map = np.ones_like(self.maze) * self.config['color']['uncertain']
         self.last_map = self.slam_map.copy()
         self._build_map()

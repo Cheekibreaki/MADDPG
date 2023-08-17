@@ -9,7 +9,7 @@ comm_mode: NC
 
 # model-related hyperparam
 test: False
-e_render : False
+e_render : True
 load_model: False
 MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_08_12_02_47\model-200.pth'
 batch_size: 20
@@ -22,28 +22,38 @@ temperature: 1.0
 # robots settings
 robots:
   number: 2
-  robotRadius: 3
-  commRange: 60
-  syncRange: 20
-  resetRandomPose: 0
-  startPose:
-    x: 61
-    y: 61
+  robot1:
+    robotRadius: 3
+    commRange: 60
+    syncRange: 20
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 40
+      fov: 360
+      resolution: 0.1
+
+  robot2:
+    robotRadius: 3
+    commRange: 60
+    syncRange: 20
+    resetRandomPose: 0
+    startPose:
+      x: 50
+      y: 100
+    laser:
+      range: 40
+      fov: 360
+      resolution: 0.1
+
   w1: 0.00002
   w2: 0.001
   w3: 0.1
-#  w1: 0.0002
-#  w2: 0.001
 
-  subregionSize:
-    y: 20
-    x: 20
 
 # sensor settings
-laser:
-  range: 40
-  fov: 360
-  resolution: 0.1
 
 
 # others
