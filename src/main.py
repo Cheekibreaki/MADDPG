@@ -302,4 +302,5 @@ plt.xlabel('# of episode')
 plt.title("Grid travelled for each episode")
 plt.show()
 
+file.close()
 world.close()
