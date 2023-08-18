@@ -242,8 +242,12 @@ for i_episode in range(n_episode):
         dicts = {}
 
         for i in range(maddpg.n_agents):
-            dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
-            dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
+            # dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
+            # dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
+            
+            dicts['actor_%d' % (i)] = maddpg.actors[i].state_dict()
+            dicts['critic_%d' % (i)] = maddpg.critics[i].state_dict()
+            
             dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
             dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
         th.save(dicts, MODEL_DIR + '/lowest_step-%d.pth' % (maddpg.episode_done))
@@ -256,8 +260,12 @@ for i_episode in range(n_episode):
             os.makedirs(MODEL_DIR)
         dicts = {}
         for i in range(maddpg.n_agents):
-            dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
-            dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
+            # dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
+            # dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
+            
+            dicts['actor_%d' % (i)] = maddpg.actors[i].state_dict()
+            dicts['critic_%d' % (i)] = maddpg.critics[i].state_dict()
+            
             dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
             dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
         th.save(dicts, MODEL_DIR + '/model-%d.pth' % (maddpg.episode_done))
