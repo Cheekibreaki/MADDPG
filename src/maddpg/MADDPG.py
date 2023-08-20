@@ -11,7 +11,10 @@ CONFIG_PATH = os.getcwd()+'/../assets/config.yaml'
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 test = config['test']
-
+GAMMA = config['GAMMA']
+tau = config['tau']
+critic_lr = config['critic_lr']
+actor_lr = config['actor_lr']
 
 def soft_update(target, source, t):
     for target_param, source_param in zip(target.parameters(),
@@ -39,8 +42,8 @@ class MADDPG:
         self.use_cuda = False
         self.episodes_before_train = episodes_before_train
 
-        self.GAMMA = 0.99
-        self.tau = 0.001
+        self.GAMMA = GAMMA
+        self.tau = tau
 
         # self.var = [1.0 for i in range(n_agents)]
         self.var = [0.01 for i in range(n_agents)]
@@ -49,9 +52,9 @@ class MADDPG:
         self.critics = [Critic(n_agents, dim_obs,
                                dim_act, dim_pose) for i in range(n_agents)]
         self.critic_optimizer = [Adam(x.parameters(),
-                                      lr=0.001) for x in self.critics]
+                                      lr=critic_lr) for x in self.critics]
         self.actor_optimizer = [Adam(x.parameters(),
-                                     lr=0.0001) for x in self.actors]    # lr = 0.0001
+                                     lr=actor_lr) for x in self.actors]    # lr = 0.0001
 
         self.actors_target = deepcopy(self.actors)
         self.critics_target = deepcopy(self.critics)

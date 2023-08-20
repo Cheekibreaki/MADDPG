@@ -94,13 +94,27 @@ class RobotExplorationT1(gym.Env):
         file_path = os.path.join(png_dir,map_id)+'.png'
         map_raw = cv2.imread(file_path,cv2.IMREAD_GRAYSCALE)
         maze=np.zeros_like(map_raw)
+
+
+
         maze[map_raw==0] = self.config['color']['obstacle']
         maze[map_raw==255] = self.config['color']['free']
         index = np.where(maze==self.config['color']['obstacle'])
         [index_row_max,index_row_min,index_col_max,index_col_min] = [np.max(index[0]),np.min(index[0]),np.max(index[1]),np.min(index[1])]
         maze = maze[index_row_min:index_row_max+1,index_col_min:index_col_max+1]
         maze = np.lib.pad(maze, padding, mode='constant', constant_values=self.config['color']['obstacle'])
-        maze = cv2.resize(maze,(self.config['map']['x'],self.config['map']['y']),interpolation=cv2.INTER_NEAREST)
+        maze = cv2.resize(maze,(self.config['map']['x'],self.config['map']['y']),interpolation=cv2.INTER_CUBIC)
+
+
+        for y in range(maze.shape[0]):
+            for x in range(maze.shape[1]):
+                pixel = maze[y, x]
+
+                # Assign the pixel to the closest target color
+                if pixel != self.config['color']['free']:
+                    maze[y, x] = self.config['color']['obstacle']
+
+        cv2.imwrite(os.path.join(png_dir, map_id) + 'backup.png', maze)
         # map = cv2.dilate(map, np.ones((3, 3)), iterations=2)
         return maze
 
