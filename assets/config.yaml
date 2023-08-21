@@ -5,26 +5,26 @@ map_id_train_set: /../assets/map_3.txt
 map_id_eval_set: /../assets/map_3.txt
 
 # [GC,LC,NC]
-comm_mode: gc
+comm_mode: LC
 
 # model-related hyperparam
-done_expoloration: 0.99
+done_expoloration: 0.95
 test: False
 e_render : True
-load_model: True
+load_model: False
 MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_20_19_16_18_map3\lowest_step-55.pth'
 #MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_17_22_31_45\lowest_step-13.pth'
-batch_size: 100
-n_episode: 1000
+batch_size: 60
+n_episode: 300
 max_steps: 50
-episodes_before_train: 100
+episodes_before_train: 60
 model_save_eps: 10
 temperature: 1.0
 
-GAMMA: 0.99
+GAMMA: 0.95
 tau: 0.01
 critic_lr: 0.001
-actor_lr: 0.001
+actor_lr: 0.0001
 
 
 
@@ -44,7 +44,7 @@ robots:
       x: 65
       y: 65
     laser:
-      range: 20
+      range: 30
       fov: 360
       resolution: 0.1
 
@@ -56,7 +56,7 @@ robots:
       x: 65
       y: 65
     laser:
-      range: 20
+      range: 30
       fov: 360
       resolution: 0.1
 

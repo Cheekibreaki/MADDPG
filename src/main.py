@@ -138,7 +138,7 @@ for i_episode in range(n_episode):
     counter_obs = []
     for i in range(n_agents):
         counter_obs.append(0)
-        print("counter_obs init:", counter_obs)
+        # print("counter_obs init:", counter_obs)
 
     if isinstance(obs, np.ndarray):
         obs_history = th.from_numpy(obs_history).float()
@@ -151,7 +151,7 @@ for i_episode in range(n_episode):
         num_steps = num_steps + 1
         # print("test")
         # render every 100 episodes to speed up training
-        if i_episode % 1 == 0 and e_render:
+        if i_episode % 20 == 0 and e_render:
             world.render()
         obs_history = obs_history.type(FloatTensor)
         action_probs = maddpg.select_action(obs_history, pose, i_episode).data.cpu()
