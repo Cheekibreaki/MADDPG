@@ -1,29 +1,30 @@
 # world settings
 json_dir: /../HouseExpo/json
 png_dir: /../assets/png
-map_id_train_set: /../assets/map_2.txt
-map_id_eval_set: /../assets/map_2.txt
+map_id_train_set: /../assets/map_3.txt
+map_id_eval_set: /../assets/map_3.txt
 
 # [GC,LC,NC]
-comm_mode: NC
+comm_mode: gc
 
 # model-related hyperparam
+done_expoloration: 0.99
 test: False
 e_render : True
-load_model: False
-MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_20_00_41_49_map2\lowest_step-454.pth'
+load_model: True
+MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_20_19_16_18_map3\lowest_step-55.pth'
 #MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_17_22_31_45\lowest_step-13.pth'
-batch_size: 20
+batch_size: 100
 n_episode: 1000
 max_steps: 50
-episodes_before_train: 20
+episodes_before_train: 100
 model_save_eps: 10
 temperature: 1.0
 
 GAMMA: 0.99
-tau: 0.001
+tau: 0.01
 critic_lr: 0.001
-actor_lr: 0.0001
+actor_lr: 0.001
 
 
 
@@ -31,11 +32,13 @@ actor_lr: 0.0001
 
 # robots settings
 robots:
+  commRange: 60
+  syncRange: 20
   number: 2
   robot1:
+    color: 100
     robotRadius: 3
-    commRange: 60
-    syncRange: 20
+
     resetRandomPose: 0
     startPose:
       x: 65
@@ -46,9 +49,8 @@ robots:
       resolution: 0.1
 
   robot2:
+    color: 60
     robotRadius: 3
-    commRange: 60
-    syncRange: 20
     resetRandomPose: 0
     startPose:
       x: 65
@@ -77,8 +79,8 @@ frontiers:
 
 # map
 map:
-  y: 100
-  x: 100
+  y: 150
+  x: 150
 
 # color
 color:

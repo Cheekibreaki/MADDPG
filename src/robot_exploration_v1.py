@@ -6,13 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sim_utils import draw_maps
 from robot import Robot
-
+import ast
 
 class RobotExplorationT1(gym.Env):
     def __init__(self,config_path=os.getcwd()+'/../assets/config.yaml', number=None):
         np.random.seed(1234)
         with open(config_path) as stream:
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
+        self.done_percent = self.config['done_expoloration']
         self.map_id_set_train = np.loadtxt(os.getcwd()+self.config['map_id_train_set'], str)
         self.map_id_set_eval = np.loadtxt(os.getcwd()+self.config['map_id_eval_set'],str)
         draw_maps(self.map_id_set_train,os.getcwd()+self.config['json_dir'],os.getcwd()+self.config['png_dir'])
@@ -141,8 +142,9 @@ class RobotExplorationT1(gym.Env):
 
     def render(self, mode='human'):
         state = np.copy(self._get_state())
-        for rbt in self.robots:
-            cv2.circle(state, (rbt.pose[1], rbt.pose[0]),rbt.robot_radius,color=self.config['color']['self'], thickness=-1)
+        for i,rbt in enumerate(self.robots):
+            robot_id = "robot" + str(i + 1)
+            cv2.circle(state, (rbt.pose[1], rbt.pose[0]),rbt.robot_radius,self.config['robots'][robot_id]['color'], thickness=-1)
         plt.figure(100)
         plt.clf()
         plt.imshow(state,cmap='gray')
@@ -197,7 +199,7 @@ class RobotExplorationT1(gym.Env):
 
         # self.render()
         self._track()
-        done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(self.maze == self.config['color']['free']) > 0.95
+        done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(self.maze == self.config['color']['free']) > self.done_percent
         #if done:
             #self.track()
         return obs_n,rwd_n,done,info_n,pose_n, counter_n
@@ -217,7 +219,7 @@ class RobotExplorationT1(gym.Env):
                     if np.linalg.norm(np.array(self_rbt.pose) - np.array(other_rbt.pose)) < self.config['robots']['syncRange']:
                         # complete communication
                         self._communicate(self_rbt, other_rbt)
-        done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(self.maze == self.config['color']['free']) > 0.95
+        done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(self.maze == self.config['color']['free']) > self.done_percent
         # self.render()
         self._track()
         return done

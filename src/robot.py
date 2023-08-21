@@ -14,10 +14,9 @@ class Robot():
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
         self.id = rbt_id
         self.maze = maze
+        self.done_percent = self.config['done_expoloration']
         robot_id = "robot"+str(rbt_id+1)
         self.robot_radius = self.config['robots'][robot_id]['robotRadius']
-        self.comm_range = self.config['robots'][robot_id]['commRange']
-        self.sync_range = self.config['robots'][robot_id]['syncRange']
         self.laser_range = self.config['robots'][robot_id]['laser']['range']
         self.laser_fov = self.config['robots'][robot_id]['laser']['fov']
         self.laser_resol = self.config['robots'][robot_id]['laser']['resolution']
@@ -167,7 +166,7 @@ class Robot():
         obs = self.get_obs()
         rwd = self.reward(counter, incrmnt_his)
         done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(
-            self.maze == self.config['color']['free']) > 0.95
+            self.maze == self.config['color']['free']) > self.done_percent
         info = 'Robot %d has moved to the target point' % (self.id)
         return obs, rwd, done, info, counter
 
@@ -181,7 +180,7 @@ class Robot():
         if target is None:
             obs = self.get_obs()
             done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(
-                self.maze == self.config['color']['free']) > 0.95
+                self.maze == self.config['color']['free']) > self.done_percent
             info = "No.%d robot fails to move." % self.id
             return obs, 0, done, info
         self.path = self.navigator.navigate(self.maze, self.pose, self.destination)
@@ -191,7 +190,7 @@ class Robot():
             self._move_one_step(point)
         obs = self.get_obs()
         done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(
-            self.maze == self.config['color']['free']) > 0.95
+            self.maze == self.config['color']['free']) > self.done_percent
         info = "No.%d robot moves successfully." % self.id
         return obs, None, done, info
 
@@ -199,13 +198,6 @@ class Robot():
         """reward function"""
         rwd1 = np.sum(incrmnt_his) * self.config['robots']['w1']
         rwd2 = -1. * counter * self.config['robots']['w2']
-        # done = np.sum(self.slam_map == self.config['color']['free']) / np.sum(
-        #     self.maze == self.config['color']['free']) > 0.95
-        # if done:
-        #     rwd3 = self.config['robots']['w3']
-        # else:
-        #     rwd3 = 0.
-        # rwd = rwd1 + rwd2 + rwd3
         rwd = rwd1 + rwd2
         return rwd
 
