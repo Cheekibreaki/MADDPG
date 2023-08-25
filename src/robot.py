@@ -17,7 +17,7 @@ else:
 
 
 class Robot():
-
+    "main updated"
     def __init__(self, rbt_id, maze, config_path=os.getcwd() + '/../assets/'+file_path):
         with open(config_path) as stream:
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
