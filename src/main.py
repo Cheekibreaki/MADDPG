@@ -301,6 +301,12 @@ for i_episode in range(n_episode):
     if maddpg.episode_done == maddpg.episodes_before_train:
         print('training now begins...')
 
+finish_time = datetime.now()
+duration = finish_time - current_time
+num_step_file = open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "a")
+num_step_file.write("total training time is " + str(duration) + ".\n")
+num_step_file.close()
+
 # Read the episode data from the text file
 with open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "r") as file:
     text = file.read()
@@ -335,7 +341,7 @@ for episode, reward in matches:
     reward_n.append(float(reward))
 
 # Plotting the rewards
-plt.figure(figsize=(8, 5))
+fig1 = plt.figure(figsize=(8, 5))
 plt.plot(episodes, reward_n)
 plt.xlabel('Episode')
 plt.ylabel('Reward')
@@ -343,12 +349,15 @@ plt.title('Rewards over Episodes')
 plt.show()
 
 # Plotting the total counter
-plt.figure(figsize=(8, 5))
+fig2 = plt.figure(figsize=(8, 5))
 plt.plot(episodes, counter_n)
 plt.xlabel('Episode')
 plt.ylabel('Total Counter')
 plt.title('Total Counter over Episodes')
 plt.show()
+
+fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/Rewards.png')
+fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_step.png')
 
 file.close()
 file_2.close()
