@@ -7,9 +7,18 @@ from navigate import AStar, AStarSimple
 import os
 
 
+import sys
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
+
+
+
 class Robot():
 
-    def __init__(self, rbt_id, maze, config_path=os.getcwd() + '/../assets/config.yaml'):
+    def __init__(self, rbt_id, maze, config_path=os.getcwd() + '/../assets/'+file_path):
         with open(config_path) as stream:
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
         self.id = rbt_id

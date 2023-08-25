@@ -8,7 +8,16 @@ from maddpg import basic_module
 import yaml
 t.manual_seed(1234)
 
-CONFIG_PATH = os.getcwd()+'/../assets/config.yaml'
+import sys
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
+
+
+# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 

@@ -15,6 +15,7 @@ from datetime import datetime
 import glob
 import re
 import matplotlib.pyplot as plt
+import sys
 
 
 def remove_files_with_prefix(directory, prefix):
@@ -44,7 +45,18 @@ num_step_file.close()
 total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
 total_counter_file.close()
 
-CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
+
+
+# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
+
+
+
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 
@@ -151,7 +163,7 @@ for i_episode in range(n_episode):
         num_steps = num_steps + 1
         # print("test")
         # render every 100 episodes to speed up training
-        if i_episode % 20 == 0 and e_render:
+        if i_episode % 30 == 0 and e_render:
             world.render()
         obs_history = obs_history.type(FloatTensor)
         action_probs = maddpg.select_action(obs_history, pose, i_episode).data.cpu()

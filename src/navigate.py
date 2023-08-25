@@ -4,7 +4,12 @@ import os
 import yaml
 import cv2
 
-
+import sys
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
 # def distance(node1, node2):
 #     return max(abs(node1.i-node2.i),abs(node1.j-node2.j))
 
@@ -46,7 +51,7 @@ class Node(object):
 
 
 class AStar:
-    def __init__(self,config_path=os.getcwd()+'/../assets/config.yaml'):
+    def __init__(self,config_path=os.getcwd()+'/../assets/'+file_path):
         self._map_color = {'uncertain': 50, 'free': 0, 'obstacle': 100, 'self': 250,'others':200}
         with open(config_path) as stream:
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
