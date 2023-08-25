@@ -4,6 +4,7 @@
 /track/
 /results/
 /src/__pycache__/
+/model/
 /src/maddpg/__pycache__/
 /*.pyc
 
