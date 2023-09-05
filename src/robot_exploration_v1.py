@@ -6,20 +6,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sim_utils import draw_maps
 from robot import Robot
-import ast
-
-import sys
-if len(sys.argv) != 2:
-    print("Usage: python script.py <file_path>")
-else:
-    # The first argument (index 0) is the script name; the second (index 1) is the file path
-    file_path = sys.argv[1]
-
-
+# import ast
+#
+# import sys
+# if len(sys.argv) != 2:
+#     print("Usage: python script.py <file_path>")
+# else:
+#     # The first argument (index 0) is the script name; the second (index 1) is the file path
+#     file_path = sys.argv[1]
 
 
 class RobotExplorationT1(gym.Env):
-    def __init__(self,config_path=os.getcwd() + '/../assets/' + file_path, number=None):
+    # def __init__(self,config_path=os.getcwd() + '/../assets/' + file_path, number=None):
+    def __init__(self, config_path=os.getcwd() + '/../assets/config.yaml', number=None):
         np.random.seed(1234)
         with open(config_path) as stream:
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
@@ -105,9 +104,6 @@ class RobotExplorationT1(gym.Env):
         file_path = os.path.join(png_dir,map_id)+'.png'
         map_raw = cv2.imread(file_path,cv2.IMREAD_GRAYSCALE)
         maze=np.zeros_like(map_raw)
-
-
-
         maze[map_raw==0] = self.config['color']['obstacle']
         maze[map_raw==255] = self.config['color']['free']
         index = np.where(maze==self.config['color']['obstacle'])

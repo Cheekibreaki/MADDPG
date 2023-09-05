@@ -1,8 +1,8 @@
 # world settings
 json_dir: /../HouseExpo/json
 png_dir: /../assets/png
-map_id_train_set: /../assets/map_1.txt
-map_id_eval_set: /../assets/map_1.txt
+map_id_train_set: /../assets/map_id_1.txt
+map_id_eval_set: /../assets/map_id_1.txt
 
 # [GC,LC,NC]
 comm_mode: NC
@@ -21,39 +21,28 @@ temperature: 1.0
 
 # robots settings
 robots:
-  number: 2
+  number: 1
   robot1:
     robotRadius: 3
     commRange: 60
     syncRange: 20
     resetRandomPose: 0
     startPose:
-      x: 65
-      y: 65
-    laser:
-      range: 20
-      fov: 360
-      resolution: 0.1
-
-  robot2:
-    robotRadius: 3
-    commRange: 60
-    syncRange: 20
-    resetRandomPose: 0
-    startPose:
-      x: 65
-      y: 65
-    laser:
-      range: 20
-      fov: 360
-      resolution: 0.1
+      x: 61
+      y: 61
 
   w1: 0.00002
   w2: 0.001
   w3: 0.1
-
+  subregionSize:
+    y: 20
+    x: 20
 
 # sensor settings
+laser:
+  range: 40
+  fov: 360
+  resolution: 0.1
 
 
 # others

@@ -18,7 +18,8 @@ else:
 
 class Robot():
     "main updated"
-    def __init__(self, rbt_id, maze, config_path=os.getcwd() + '/../assets/'+file_path):
+    # def __init__(self, rbt_id, maze, config_path=os.getcwd() + '/../assets/'+file_path):
+    def __init__(self, rbt_id, maze, config_path=os.getcwd() + '/../assets/config.yaml'):
         with open(config_path) as stream:
             self.config = yaml.load(stream, Loader=yaml.SafeLoader)
         self.id = rbt_id
@@ -55,13 +56,10 @@ class Robot():
             x_min, x_max = int(0.1 * w), int(0.8 * w)
             y = np.random.randint(y_min, y_max)
             x = np.random.randint(x_min, x_max)
-            # y = y_min
-            # x = x_min
+
             while self.maze[y, x] == self.config['color']['obstacle']:
                 y = np.random.randint(y_min, y_max)
                 x = np.random.randint(x_min, x_max)
-                # y = y+1
-                # x = x+1
             return y, x
         else:
             return self.config['robots'][robot_id]['startPose']['y'], self.config['robots'][robot_id]['startPose']['x']
