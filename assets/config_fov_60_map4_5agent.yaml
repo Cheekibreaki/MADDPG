@@ -1,8 +1,8 @@
 # world settings
 json_dir: /../HouseExpo/json
 png_dir: /../assets/png
-map_id_train_set: /../assets/map_3.txt
-map_id_eval_set: /../assets/map_3.txt
+map_id_train_set: /../assets/map_4.txt
+map_id_eval_set: /../assets/map_4.txt
 
 # [GC,LC,NC]
 comm_mode: LC
@@ -10,15 +10,15 @@ comm_mode: LC
 # model-related hyperparam
 done_expoloration: 0.95
 test: False
-e_render : True
+#e_render : True
+e_render : False
 load_model: False
-MODEL_PATH: 'E:\Summer Research 2023\MADDPG_New\MADDPG\model\map3_converge\lowest_step-213.pth'
-#MODEL_PATH: ''
-#MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_17_22_31_45\lowest_step-13.pth'
-batch_size: 60
-n_episode: 500
+#load_model: True
+MODEL_PATH: 'D:\2023 Summer\MADDPG\assets\model\3agents_map4\model-490.pth'
+batch_size: 100
+n_episode: 700
 max_steps: 50
-episodes_before_train: 60
+episodes_before_train: 100
 model_save_eps: 10
 temperature: 1.0
 
@@ -32,22 +32,45 @@ robots:
 
   commRange: 60
   syncRange: 20
-  number: 2
+  number: 5
   robot1:
     color: 100
-    robotRadius: 1
-
+    robotRadius: 3
     resetRandomPose: 0
     startPose:
       x: 61
       y: 61
     laser:
       range: 30
-      fov: 360
+      fov: 60
       resolution: 0.1
 
   robot2:
-    color: 60
+    color: 150
+    robotRadius: 3
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 60
+      resolution: 0.1
+
+  robot3:
+    color: 50
+    robotRadius: 3
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 60
+      resolution: 0.1
+
+  robot4:
+    color: 180
     robotRadius: 1
     resetRandomPose: 0
     startPose:
@@ -55,10 +78,24 @@ robots:
       y: 61
     laser:
       range: 30
-      fov: 360
+      fov: 60
       resolution: 0.1
 
-#  robot3:
+  robot5:
+    color: 220
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 60
+      resolution: 0.1
+
+
+
+  #  robot3:
 #    color: 30
 #    robotRadius: 1
 #    resetRandomPose: 0

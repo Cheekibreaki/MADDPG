@@ -1,8 +1,8 @@
 # world settings
 json_dir: /../HouseExpo/json
 png_dir: /../assets/png
-map_id_train_set: /../assets/map_3.txt
-map_id_eval_set: /../assets/map_3.txt
+map_id_train_set: /../assets/map_4.txt
+map_id_eval_set: /../assets/map_4.txt
 
 # [GC,LC,NC]
 comm_mode: LC
@@ -10,9 +10,12 @@ comm_mode: LC
 # model-related hyperparam
 done_expoloration: 0.95
 test: False
-e_render : True
+#test: True
+e_render : False
+#e_render : True
 load_model: False
-MODEL_PATH: 'E:\Summer Research 2023\MADDPG_New\MADDPG\model\map3_converge\lowest_step-213.pth'
+#load_model: True
+MODEL_PATH: 'D:\2023 Summer\MADDPG\model\2023_09_07_11_20_07\model-490.pth'
 #MODEL_PATH: ''
 #MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_17_22_31_45\lowest_step-13.pth'
 batch_size: 60
@@ -32,50 +35,71 @@ robots:
 
   commRange: 60
   syncRange: 20
-  number: 2
+  number: 3
   robot1:
     color: 100
     robotRadius: 1
-
     resetRandomPose: 0
     startPose:
-      x: 61
-      y: 61
+      x: 100
+      y: 140
     laser:
-      range: 30
-      fov: 360
+      range: 10
+      fov: 60
       resolution: 0.1
 
   robot2:
-    color: 60
+    color: 150
     robotRadius: 1
     resetRandomPose: 0
     startPose:
-      x: 61
-      y: 61
+      x: 70
+      y: 8
     laser:
-      range: 30
-      fov: 360
+      range: 10
+      fov: 60
       resolution: 0.1
 
-#  robot3:
-#    color: 30
-#    robotRadius: 1
-#    resetRandomPose: 0
-#    startPose:
-#      x: 65
-#      y: 65
-#    laser:
-#      range: 20
-#      fov: 60
-#      resolution: 0.1
+  robot3:
+    color: 50
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 139
+      y: 87
+    laser:
+      range: 10
+      fov: 60
+      resolution: 0.1
+
+  robot4:
+    color: 180
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 20
+      y: 50
+    laser:
+      range: 10
+      fov: 60
+      resolution: 0.1
+
+  robot5:
+    color: 220
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 60
+      y: 115
+    laser:
+      range: 10
+      fov: 60
+      resolution: 0.1
+
 
   w1: 0.00002
   w2: 0.001
   w3: 0.1
-
-
-# sensor settings
 
 
 # others

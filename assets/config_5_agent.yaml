@@ -1,4 +1,4 @@
-# world settings
+#config_5_agent.yaml# world settings
 json_dir: /../HouseExpo/json
 png_dir: /../assets/png
 map_id_train_set: /../assets/map_3.txt
@@ -10,7 +10,7 @@ comm_mode: LC
 # model-related hyperparam
 done_expoloration: 0.95
 test: False
-e_render : True
+e_render : False
 load_model: False
 MODEL_PATH: 'E:\Summer Research 2023\MADDPG_New\MADDPG\model\map3_converge\lowest_step-213.pth'
 #MODEL_PATH: ''
@@ -32,7 +32,7 @@ robots:
 
   commRange: 60
   syncRange: 20
-  number: 2
+  number: 5
   robot1:
     color: 100
     robotRadius: 1
@@ -57,6 +57,42 @@ robots:
       range: 30
       fov: 360
       resolution: 0.1
+
+  robot3:
+    color: 140
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 360
+      resolution: 0.1
+  robot4:
+    color: 180
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 360
+      resolution: 0.1
+  robot5:
+    color: 220
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 360
+      resolution: 0.1
+
+
 
 #  robot3:
 #    color: 30

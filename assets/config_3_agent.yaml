@@ -32,7 +32,7 @@ robots:
 
   commRange: 60
   syncRange: 20
-  number: 2
+  number: 3
   robot1:
     color: 100
     robotRadius: 1
@@ -57,6 +57,20 @@ robots:
       range: 30
       fov: 360
       resolution: 0.1
+
+  robot3:
+    color: 60
+    robotRadius: 1
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 360
+      resolution: 0.1
+
+
 
 #  robot3:
 #    color: 30

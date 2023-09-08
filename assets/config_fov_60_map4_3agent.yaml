@@ -1,8 +1,8 @@
 # world settings
 json_dir: /../HouseExpo/json
 png_dir: /../assets/png
-map_id_train_set: /../assets/map_3.txt
-map_id_eval_set: /../assets/map_3.txt
+map_id_train_set: /../assets/map_4.txt
+map_id_eval_set: /../assets/map_4.txt
 
 # [GC,LC,NC]
 comm_mode: LC
@@ -11,8 +11,10 @@ comm_mode: LC
 done_expoloration: 0.95
 test: False
 e_render : True
+#e_render : False
 load_model: False
-MODEL_PATH: 'E:\Summer Research 2023\MADDPG_New\MADDPG\model\map3_converge\lowest_step-213.pth'
+#load_model: True
+MODEL_PATH: 'D:\2023 Summer\MADDPG\assets\model\3agents_map4\model-490.pth'
 #MODEL_PATH: ''
 #MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_17_22_31_45\lowest_step-13.pth'
 batch_size: 60
@@ -32,31 +34,44 @@ robots:
 
   commRange: 60
   syncRange: 20
-  number: 2
+  number: 3
   robot1:
     color: 100
-    robotRadius: 1
-
+    robotRadius: 3
     resetRandomPose: 0
     startPose:
       x: 61
       y: 61
     laser:
       range: 30
-      fov: 360
+      fov: 60
       resolution: 0.1
 
   robot2:
-    color: 60
-    robotRadius: 1
+    color: 150
+    robotRadius: 3
     resetRandomPose: 0
     startPose:
       x: 61
       y: 61
     laser:
       range: 30
-      fov: 360
+      fov: 60
       resolution: 0.1
+
+  robot3:
+    color: 50
+    robotRadius: 3
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 60
+      resolution: 0.1
+
+
 
 #  robot3:
 #    color: 30

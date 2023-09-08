@@ -6,7 +6,7 @@ import numpy as np
 from sim_utils import gumbel_softmax
 from maddpg import basic_module
 import yaml
-t.manual_seed(1234)
+# t.manual_seed(1234)
 
 import sys
 if len(sys.argv) != 2:
@@ -29,7 +29,7 @@ class Critic(basic_module.BasicModule):
     def __init__(self, n_agent, dim_observation, dim_action, dim_pose):
         print("init critic")
         super(Critic, self).__init__()
-        t.manual_seed(0)
+        # t.manual_seed(0)
         # RMADDPG
         self.hidden_dim = 256
         self.n_agent = n_agent
@@ -102,7 +102,7 @@ class Actor(basic_module.BasicModule):
     def __init__(self, n_agent, dim_pose):
         super(Actor, self).__init__()
         print("init actor")
-        t.manual_seed(0)
+        # t.manual_seed(0)
         # RNN
         self.hidden_dim = 256
         out_dim = 8
