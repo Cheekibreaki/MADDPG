@@ -366,15 +366,21 @@ def main():
         text = file_2.read()
     # Define regular expressions to match episode and #reward lines
     reward_pattern = r'eps: (\d+) #reward: tensor\((-?\d+\.\d+)\)'
+    step_pattern = r'eps: (\d+) #step: (\d+)'
 
     # Find all episode and #reward matches
     matches = re.findall(reward_pattern, text)
+    matches_step = re.findall(step_pattern, text)
 
     reward_n = []
+    step_n = []
     # Extract episode number and #reward
     for episode, reward in matches:
-        print(f"Episode: {episode}, Reward: {float(reward)}")
+        # print(f"Episode: {episode}, Reward: {float(reward)}")
         reward_n.append(float(reward))
+    for episode, step in matches_step:
+        print(f"Episode: {episode}, Reward: {int(step)}")
+        step_n.append(int(step))
 
     # Plotting the rewards
     fig1 = plt.figure(figsize=(8, 5))
@@ -392,8 +398,17 @@ def main():
     plt.title('Total Counter over Episodes')
     # plt.show()
 
-    fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/Rewards.png')
-    fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_step.png')
+    # Plotting the rewards
+    fig3 = plt.figure(figsize=(8, 5))
+    plt.plot(episodes, step_n)
+    plt.xlabel('Episode')
+    plt.ylabel('Total steps')
+    plt.title('total steps over Episodes')
+    plt.show()
+
+    fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/rewards.png')
+    fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_counter.png')
+    fig3.savefig(os.getcwd() + '/../runs/' + time_now + '/steps.png')
 
     file.close()
     file_2.close()
