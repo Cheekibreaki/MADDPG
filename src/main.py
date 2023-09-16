@@ -35,16 +35,6 @@ print(th.cuda.is_available())
 # do not render the scene
 
 def main():
-    # tensorboard writer
-    time_now = time.strftime("%m%d_%H%M%S")
-
-    writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
-
-    num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
-    num_step_file.close()
-
-    total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
-    total_counter_file.close()
 
     if len(sys.argv) != 2:
         print("Usage: python script.py <file_path>")
@@ -52,9 +42,27 @@ def main():
         # The first argument (index 0) is the script name; the second (index 1) is the file path
         file_path = sys.argv[1]
 
-
+    # tensorboard writer
     # CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
     CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
+
+    time_now = time.strftime("%m%d_%H%M%S") + file_path
+
+    writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
+
+    num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
+    num_step_file.close()
+
+    smart_total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/smart_total_counter.txt', "w")
+    smart_total_counter_file.close()
+
+    total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
+    total_counter_file.close()
+
+
+
+
+
 
 
 
@@ -84,7 +92,7 @@ def main():
 
     n_episode = config['n_episode']
     # max_steps = 1000
-    max_steps = 50
+    max_steps = config['max_steps']
     # episodes_before_train = 1000
     episodes_before_train = 400
 
@@ -149,6 +157,8 @@ def main():
             obs_history[i] = np.vstack((obs_t_minus_0[i],obs_t_minus_1[i],obs_t_minus_2[i],
                                 obs_t_minus_3[i],obs_t_minus_4[i],obs_t_minus_5[i]))
         counter_obs = []
+        smart_counter = 0
+
         for i in range(n_agents):
             counter_obs.append(0)
             # print("counter_obs init:", counter_obs)
@@ -201,8 +211,9 @@ def main():
             obs_, reward, done, _, next_pose, counter = world.step(acts)
             for i in range(n_agents):
                 counter_obs[i] = counter_obs[i] + counter[i]
-            # print("counter_obs_after_run:", counter_obs)
 
+            # print("counter_obs_after_run:", counter_obs)
+            smart_counter = smart_counter + max(counter)
             next_pose = th.tensor(next_pose)
             reward = th.FloatTensor(reward).type(FloatTensor)
             obs_ = np.stack(obs_)
@@ -243,11 +254,16 @@ def main():
         total_counter_file = open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "a")
         total_counter = sum(counter_obs)
         for i in range(n_agents):
-            total_counter_file.write("eps: " + str(i_episode) + " step for robot " + str(i) + ": " +
+            total_counter_file.write("eps: " + str(i_episode) + " counter for robot " + str(i) + ": " +
                                      str(counter_obs[i]) + "\n")
         total_counter_file.write("eps: " + str(i_episode) + " #total_counter: " + str(total_counter) + "\n")
         num_step_file.close()
         total_counter_file.close()
+
+        smart_total_counter_file = open(os.getcwd() + '/../runs/' + time_now + '/smart_total_counter.txt', "a")
+        smart_total_counter_file.write("eps: " + str(i_episode) + " #smart_total_counter: " + str(smart_counter) + "\n")
+        smart_total_counter_file.close()
+
 
         if num_steps <= lowest_step:
             lowest_step = num_steps
@@ -287,6 +303,24 @@ def main():
                 dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
             th.save(dicts, MODEL_DIR + '/model-%d.pth' % (maddpg.episode_done))
             # th.save(dicts, MODEL_DIR+'/model-%d.pth'%(config['robots']['number']))
+
+        if n_episode-1 == i_episode:
+            print('Save Models......')
+            if not os.path.exists(MODEL_DIR):
+                os.makedirs(MODEL_DIR)
+            dicts = {}
+            for i in range(maddpg.n_agents):
+                # dicts['actor_%d' % (i)] = maddpg.actors_target[i].state_dict()
+                # dicts['critic_%d' % (i)] = maddpg.critics_target[i].state_dict()
+
+                dicts['actor_%d' % (i)] = maddpg.actors[i].state_dict()
+                dicts['critic_%d' % (i)] = maddpg.critics[i].state_dict()
+
+                dicts['actor_optim_%d' % (i)] = maddpg.actor_optimizer[i].state_dict()
+                dicts['critic_optim_%d' % (i)] = maddpg.critic_optimizer[i].state_dict()
+            th.save(dicts, MODEL_DIR + '/model-%d.pth' % (maddpg.episode_done))
+            # th.save(dicts, MODEL_DIR+'/model-%d.pth'%(config['robots']['number']))
+
         print('Episode: %d, reward = %f' % (i_episode, total_reward))
         reward_record.append(total_reward)
         # visual
@@ -348,7 +382,7 @@ def main():
     plt.xlabel('Episode')
     plt.ylabel('Reward')
     plt.title('Rewards over Episodes')
-    plt.show()
+    # plt.show()
 
     # Plotting the total counter
     fig2 = plt.figure(figsize=(8, 5))
@@ -356,7 +390,7 @@ def main():
     plt.xlabel('Episode')
     plt.ylabel('Total Counter')
     plt.title('Total Counter over Episodes')
-    plt.show()
+    # plt.show()
 
     fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/Rewards.png')
     fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_step.png')
