@@ -374,6 +374,7 @@ def main():
 
     reward_n = []
     step_n = []
+
     # Extract episode number and #reward
     for episode, reward in matches:
         # print(f"Episode: {episode}, Reward: {float(reward)}")
@@ -381,6 +382,24 @@ def main():
     for episode, step in matches_step:
         print(f"Episode: {episode}, Reward: {int(step)}")
         step_n.append(int(step))
+
+    with open(os.getcwd() + '/../runs/' + time_now + '/smart_total_counter.txt', "r") as file_3:
+        text = file_3.read()
+
+
+    smart_counter_n = []
+
+    reward_pattern = r'eps: (\d+)  #      smart_total_counter: (\d+)'
+
+
+    # Find all episode and #reward matches
+    matches = re.findall(reward_pattern, text)
+
+    # Extract episode number and #reward
+    for episode, reward in matches:
+        # print(f"Episode: {episode}, Reward: {float(reward)}")
+        smart_counter_n.append(float(reward))
+
 
     # Plotting the rewards
     fig1 = plt.figure(figsize=(8, 5))
@@ -404,14 +423,24 @@ def main():
     plt.xlabel('Episode')
     plt.ylabel('Total steps')
     plt.title('total steps over Episodes')
-    plt.show()
+
+
+    fig4 = plt.figure(figsize=(8, 5))
+    plt.plot(episodes, smart_counter_n)
+    plt.xlabel('Episode')
+    plt.ylabel('Total Smart Counter')
+    plt.title('total steps over Episodes')
+
+
 
     fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/rewards.png')
     fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_counter.png')
     fig3.savefig(os.getcwd() + '/../runs/' + time_now + '/steps.png')
+    fig4.savefig(os.getcwd() + '/../runs/' + time_now + '/smart_total_counter.png')
 
     file.close()
     file_2.close()
+    file_3.close()
     world.close()
 
 

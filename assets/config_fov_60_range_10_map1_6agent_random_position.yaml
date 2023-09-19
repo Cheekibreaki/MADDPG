@@ -22,7 +22,7 @@ batch_size: 60
 n_episode: 500
 max_steps: 50
 episodes_before_train: 60
-model_save_eps: 10
+model_save_eps: 100
 temperature: 1.0
 
 GAMMA: 0.95
