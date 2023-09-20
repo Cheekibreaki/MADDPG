@@ -59,13 +59,6 @@ def main():
     total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
     total_counter_file.close()
 
-
-
-
-
-
-
-
     with open(CONFIG_PATH,'r') as stream:
         config = yaml.safe_load(stream)
 
@@ -117,7 +110,6 @@ def main():
 
     maddpg = MADDPG(n_agents, n_states, n_actions, n_pose, batch_size, capacity,
                     episodes_before_train)
-
 
     if load_model:
         print("loaded")
@@ -264,7 +256,6 @@ def main():
         smart_total_counter_file.write("eps: " + str(i_episode) + " #smart_total_counter: " + str(smart_counter) + "\n")
         smart_total_counter_file.close()
 
-
         if num_steps <= lowest_step:
             lowest_step = num_steps
 
@@ -342,109 +333,20 @@ def main():
     num_step_file.write("total training time is " + str(duration) + ".\n")
     num_step_file.close()
 
-    # Read the episode data from the text file
     with open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "r") as file:
         text = file.read()
-
-    # Define regular expressions to match episode and total_counter lines
-    episode_pattern = r'eps: (\d+) #total_counter: (\d+)'
-
+    final_total_counter = 0
+    pattern = r'eps: (\d+) #total_counter: (\d+)'
     # Find all episode and total_counter matches
-    matches = re.findall(episode_pattern, text)
-
-    episodes = []
-    counter_n = []
-    # Extract and print episode number and total_counter
-    for episode, total_counter in matches:
-        print(f"Episode: {episode}, Total Counter: {total_counter}")
-        episodes.append(int(episode))
-        counter_n.append(int(total_counter))
-    print("counter_n for all episode:", counter_n)
+    matches = re.findall(pattern, text)
     if matches:
         final_episode, final_total_counter = matches[-1]
-    with open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "r") as file_2:
-        text = file_2.read()
-    # Define regular expressions to match episode and #reward lines
-    reward_pattern = r'eps: (\d+) #reward: tensor\((-?\d+\.\d+)\)'
-    step_pattern = r'eps: (\d+) #step: (\d+)'
-
-    # Find all episode and #reward matches
-    matches = re.findall(reward_pattern, text)
-    matches_step = re.findall(step_pattern, text)
-
-    reward_n = []
-    step_n = []
-
-    # Extract episode number and #reward
-    for episode, reward in matches:
-        # print(f"Episode: {episode}, Reward: {float(reward)}")
-        reward_n.append(float(reward))
-    for episode, step in matches_step:
-        print(f"Episode: {episode}, Reward: {int(step)}")
-        step_n.append(int(step))
-
-    with open(os.getcwd() + '/../runs/' + time_now + '/smart_total_counter.txt', "r") as file_3:
-        text = file_3.read()
-
-
-    smart_counter_n = []
-
-    reward_pattern = r'eps: (\d+)  #      smart_total_counter: (\d+)'
-
-
-    # Find all episode and #reward matches
-    matches = re.findall(reward_pattern, text)
-
-    # Extract episode number and #reward
-    for episode, reward in matches:
-        # print(f"Episode: {episode}, Reward: {float(reward)}")
-        smart_counter_n.append(float(reward))
-
-
-    # Plotting the rewards
-    fig1 = plt.figure(figsize=(8, 5))
-    plt.plot(episodes, reward_n)
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
-    plt.title('Rewards over Episodes')
-    # plt.show()
-
-    # Plotting the total counter
-    fig2 = plt.figure(figsize=(8, 5))
-    plt.plot(episodes, counter_n)
-    plt.xlabel('Episode')
-    plt.ylabel('Total Counter')
-    plt.title('Total Counter over Episodes')
-    # plt.show()
-
-    # Plotting the rewards
-    fig3 = plt.figure(figsize=(8, 5))
-    plt.plot(episodes, step_n)
-    plt.xlabel('Episode')
-    plt.ylabel('Total steps')
-    plt.title('total steps over Episodes')
-
-
-    fig4 = plt.figure(figsize=(8, 5))
-    plt.plot(episodes, smart_counter_n)
-    plt.xlabel('Episode')
-    plt.ylabel('Total Smart Counter')
-    plt.title('total steps over Episodes')
-
-
-
-    fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/rewards.png')
-    fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_counter.png')
-    fig3.savefig(os.getcwd() + '/../runs/' + time_now + '/steps.png')
-    fig4.savefig(os.getcwd() + '/../runs/' + time_now + '/smart_total_counter.png')
 
     file.close()
-    file_2.close()
-    file_3.close()
     world.close()
 
-
     return final_total_counter
+
 
 if __name__ == "__main__":
     returned_value = main()
