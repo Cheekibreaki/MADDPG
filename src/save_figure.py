@@ -43,7 +43,7 @@ def generate_plot(figure_type, file_path, dir_path):
     plt.xlabel('Episode')
     plt.ylabel('{}'.format(figure_type))
     plt.title('{} over Episodes'.format(dir_path))
-    plt.show()
+    # plt.show()
 
     fig.savefig(dir_path + '/{}.png'.format(figure_type))
 
