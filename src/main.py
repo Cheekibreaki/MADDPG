@@ -130,6 +130,7 @@ def main():
     prev_critic = None
 
     FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
+    total_counter_all = []
     for i_episode in range(n_episode):
         try:
             obs,pose = world.reset(random=True)
@@ -245,6 +246,7 @@ def main():
 
         total_counter_file = open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "a")
         total_counter = sum(counter_obs)
+        total_counter_all.append()
         for i in range(n_agents):
             total_counter_file.write("eps: " + str(i_episode) + " counter for robot " + str(i) + ": " +
                                      str(counter_obs[i]) + "\n")
@@ -342,12 +344,15 @@ def main():
     if matches:
         final_episode, final_total_counter = matches[-1]
 
+    # calculate the last 100 episodes' total steps
+    total_counter_last_100 = total_counter_all[-100:]
+
     file.close()
     world.close()
 
-    return final_total_counter
+    return final_total_counter, sum(total_counter_last_100) / len(total_counter_last_100)
 
 
 if __name__ == "__main__":
-    returned_value = main()
-    print(returned_value)
+    returned_value, last_100_avg = main()
+    print(returned_value, last_100_avg)
