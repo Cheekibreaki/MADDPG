@@ -246,7 +246,7 @@ def main():
 
         total_counter_file = open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "a")
         total_counter = sum(counter_obs)
-        total_counter_all.append()
+        total_counter_all.append(total_counter)
         for i in range(n_agents):
             total_counter_file.write("eps: " + str(i_episode) + " counter for robot " + str(i) + ": " +
                                      str(counter_obs[i]) + "\n")
