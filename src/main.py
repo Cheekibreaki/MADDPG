@@ -236,7 +236,11 @@ def main():
             obs_history = next_obs_history
             pose = next_pose
             if t % 10 == 0:
-                c_loss, a_loss = maddpg.update_policy()
+                if not test:
+                    c_loss, a_loss = maddpg.update_policy()
+                else:
+                    c_loss = None
+                    a_loss = None
             if done:
                 break
         # print("rr", rr)
