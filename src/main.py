@@ -17,6 +17,7 @@ import re
 import matplotlib.pyplot as plt
 import sys
 
+
 def find_min_convergence_region(filename, window_size=10, threshold=20):
     # Read the file and extract eps and values
     with open(filename, 'r') as f:
@@ -70,12 +71,6 @@ time_now = time.strftime("%m%d_%H%M%S")
 
 writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
 
-num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
-num_step_file.close()
-
-total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
-total_counter_file.close()
-
 if len(sys.argv) != 2:
     print("Usage: python script.py <file_path>")
 else:
@@ -86,8 +81,18 @@ else:
 # CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
 CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
 
-#
-# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+file_path_without_extension, _ = os.path.splitext(file_path)
+time_now = time.strftime("%m%d_%H%M%S") + file_path_without_extension
+
+num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
+num_step_file.close()
+
+smart_total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/smart_total_counter.txt', "w")
+smart_total_counter_file.close()
+
+total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
+total_counter_file.close()
+
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 
@@ -159,6 +164,7 @@ prev_actor = None
 prev_critic = None
 
 FloatTensor = th.cuda.FloatTensor if maddpg.use_cuda else th.FloatTensor
+total_counter_all = []
 for i_episode in range(n_episode):
     try:
         obs,pose = world.reset(random=True)
@@ -178,6 +184,7 @@ for i_episode in range(n_episode):
         obs_history[i] = np.vstack((obs_t_minus_0[i],obs_t_minus_1[i],obs_t_minus_2[i],
                             obs_t_minus_3[i],obs_t_minus_4[i],obs_t_minus_5[i]))
     counter_obs = []
+    smart_counter = 0
     for i in range(n_agents):
         counter_obs.append(0)
         # print("counter_obs init:", counter_obs)
@@ -275,10 +282,11 @@ for i_episode in range(n_episode):
 
     total_counter_file = open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "a")
     total_counter = sum(counter_obs)
-    for i in range(n_agents):
-        total_counter_file.write("eps: " + str(i_episode) + " step for robot " + str(i) + ": " +
-                                 str(counter_obs[i]) + "\n")
-    total_counter_file.write("eps: " + str(i_episode) + " #total_counter: " + str(total_counter) + "\n")
+    total_counter_all.append(total_counter)
+    # for i in range(n_agents):
+    #     total_counter_file.write("eps: " + str(i_episode) + " step for robot " + str(i) + ": " +
+    #                              str(counter_obs[i]) + "\n")
+    total_counter_file.write("eps: " + str(i_episode) + " #smart_total_counter: " + str(total_counter) + "\n")
     num_step_file.close()
     total_counter_file.close()
 
@@ -340,64 +348,70 @@ num_step_file = open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "a
 num_step_file.write("total training time is " + str(duration) + ".\n")
 num_step_file.close()
 
-# Read the episode data from the text file
-with open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "r") as file:
-    text = file.read()
+# # Read the episode data from the text file
+# with open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "r") as file:
+#     text = file.read()
+#
+# # Define regular expressions to match episode and total_counter lines
+# episode_pattern = r'eps: (\d+) #total_counter: (\d+)'
+#
+# # Find all episode and total_counter matches
+# matches = re.findall(episode_pattern, text)
+#
+# episodes = []
+# counter_n = []
+# # Extract and print episode number and total_counter
+# for episode, total_counter in matches:
+#     print(f"Episode: {episode}, Total Counter: {total_counter}")
+#     episodes.append(int(episode))
+#     counter_n.append(int(total_counter))
+# print("counter_n for all episode:", counter_n)
+# if matches:
+#     final_episode, final_total_counter = matches[-1]
+# with open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "r") as file_2:
+#     text = file_2.read()
+# # Define regular expressions to match episode and #reward lines
+# reward_pattern = r'eps: (\d+) #reward: tensor\((-?\d+\.\d+)\)'
+#
+# # Find all episode and #reward matches
+# matches = re.findall(reward_pattern, text)
+#
+# reward_n = []
+# # Extract episode number and #reward
+# for episode, reward in matches:
+#     print(f"Episode: {episode}, Reward: {float(reward)}")
+#     reward_n.append(float(reward))
+#
+# # Plotting the rewards
+# fig1 = plt.figure(figsize=(8, 5))
+# plt.plot(episodes, reward_n)
+# plt.xlabel('Episode')
+# plt.ylabel('Reward')
+# plt.title('Rewards over Episodes')
+# plt.show()
+#
+# # Plotting the total counter
+# fig2 = plt.figure(figsize=(8, 5))
+# plt.plot(episodes, counter_n)
+# plt.xlabel('Episode')
+# plt.ylabel('Total Counter')
+# plt.title('Total Counter over Episodes')
+# plt.show()
+#
+# fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/Rewards.png')
+# fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_step.png')
 
-# Define regular expressions to match episode and total_counter lines
-episode_pattern = r'eps: (\d+) #total_counter: (\d+)'
-
-# Find all episode and total_counter matches
-matches = re.findall(episode_pattern, text)
-
-episodes = []
-counter_n = []
-# Extract and print episode number and total_counter
-for episode, total_counter in matches:
-    print(f"Episode: {episode}, Total Counter: {total_counter}")
-    episodes.append(int(episode))
-    counter_n.append(int(total_counter))
-print("counter_n for all episode:", counter_n)
-if matches:
-    final_episode, final_total_counter = matches[-1]
-with open(os.getcwd() + '/../runs/' + time_now + '/num_steps.txt', "r") as file_2:
-    text = file_2.read()
-# Define regular expressions to match episode and #reward lines
-reward_pattern = r'eps: (\d+) #reward: tensor\((-?\d+\.\d+)\)'
-
-# Find all episode and #reward matches
-matches = re.findall(reward_pattern, text)
-
-reward_n = []
-# Extract episode number and #reward
-for episode, reward in matches:
-    print(f"Episode: {episode}, Reward: {float(reward)}")
-    reward_n.append(float(reward))
-
-# Plotting the rewards
-fig1 = plt.figure(figsize=(8, 5))
-plt.plot(episodes, reward_n)
-plt.xlabel('Episode')
-plt.ylabel('Reward')
-plt.title('Rewards over Episodes')
-plt.show()
-
-# Plotting the total counter
-fig2 = plt.figure(figsize=(8, 5))
-plt.plot(episodes, counter_n)
-plt.xlabel('Episode')
-plt.ylabel('Total Counter')
-plt.title('Total Counter over Episodes')
-plt.show()
-
-fig1.savefig(os.getcwd() + '/../runs/' + time_now + '/Rewards.png')
-fig2.savefig(os.getcwd() + '/../runs/' + time_now + '/total_step.png')
-
-file.close()
-file_2.close()
+total_counter_last = total_counter_all[-100:]
+print("last 100 total counter is:", total_counter_last)
+# file.close()
+# file_2.close()
 world.close()
+result = find_min_convergence_region(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt')
+if result:
+    print("The average value is ", result[2])
+
 
 #
 # if __name__ == "__main__":
 #     returned_value = main()
-print(final_total_counter)
+#     print(returned_value)
