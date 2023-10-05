@@ -17,6 +17,37 @@ import re
 import matplotlib.pyplot as plt
 import sys
 
+def find_min_convergence_region(filename, window_size=10, threshold=20):
+    # Read the file and extract eps and values
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+
+    episodes = []
+    values = []
+    for line in lines:
+        parts = line.split()
+        eps = int(parts[1])
+        val = int(parts[3])
+        episodes.append(eps)
+        values.append(val)
+
+    # Search for all convergence regions
+    regions = []
+    for i in range(len(values) - window_size):
+        window_values = values[i:i + window_size]
+        if (std := (sum(
+                (x - sum(window_values) / window_size) ** 2 for x in window_values) / window_size) ** 0.5) <= threshold:
+            regions.append((episodes[i], episodes[i + window_size - 1], sum(window_values) / window_size))
+
+    # If no regions found, return average of last 'window_size' values
+    if not regions:
+        last_values = values[-window_size:]
+        return (episodes[-window_size], episodes[-1], sum(last_values) / window_size)
+
+    # Find the region with the minimum average value
+    min_region = min(regions, key=lambda x: x[2])
+    return min_region
+
 
 def remove_files_with_prefix(directory, prefix):
     # Get a list of files matching the prefix pattern in the specified directory
@@ -45,18 +76,18 @@ num_step_file.close()
 total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
 total_counter_file.close()
 
-# if len(sys.argv) != 2:
-#     print("Usage: python script.py <file_path>")
-# else:
-#     # The first argument (index 0) is the script name; the second (index 1) is the file path
-#     file_path = sys.argv[1]
-#
-#
-# # CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
-# CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
 
 
-CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
+
+#
+# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 
@@ -369,4 +400,4 @@ world.close()
 #
 # if __name__ == "__main__":
 #     returned_value = main()
-#     print(returned_value)
+print(final_total_counter)

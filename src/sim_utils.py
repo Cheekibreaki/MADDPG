@@ -7,16 +7,16 @@ import numpy as np
 import json
 import cv2
 import yaml
-# import sys
-# if len(sys.argv) != 2:
-#     print("Usage: python script.py <file_path>")
-# else:
-#     # The first argument (index 0) is the script name; the second (index 1) is the file path
-#     file_path = sys.argv[1]
+import sys
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
 
 
-CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
-# CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
+# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
 
 
 with open(CONFIG_PATH,'r') as stream:

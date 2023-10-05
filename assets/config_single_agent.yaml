@@ -1,0 +1,87 @@
+# world settings
+json_dir: /../HouseExpo/json
+png_dir: /../assets/png
+map_id_train_set: /../assets/map_3.txt
+map_id_eval_set: /../assets/map_3.txt
+
+# [GC,LC,NC]
+comm_mode: LC
+
+# model-related hyperparam
+done_expoloration: 0.95
+test: False
+e_render : True
+load_model: False
+MODEL_PATH: 'E:\Summer Research 2023\MADDPG_New\MADDPG\model\map3_converge\lowest_step-213.pth'
+#MODEL_PATH: ''
+#MODEL_PATH: 'E:\Summer Research 2023\MADDPG\MADDPG\model\2023_08_17_22_31_45\lowest_step-13.pth'
+batch_size: 60
+n_episode: 500
+max_steps: 50
+episodes_before_train: 60
+model_save_eps: 10
+temperature: 1.0
+
+GAMMA: 0.95
+tau: 0.01
+critic_lr: 0.001
+actor_lr: 0.0001
+
+# robots settings
+robots:
+
+  commRange: 60
+  syncRange: 20
+  number: 1
+  robot1:
+    color: 100
+    robotRadius: 1
+
+    resetRandomPose: 0
+    startPose:
+      x: 61
+      y: 61
+    laser:
+      range: 30
+      fov: 360
+      resolution: 0.1
+
+  w1: 0.00002
+  w2: 0.001
+  w3: 0.1
+
+
+# sensor settings
+
+
+# others
+stateSize:
+  x: 145
+  y: 145
+
+# frontiers
+frontiers:
+  number: 8
+
+# map
+map:
+  y: 150
+  x: 150
+
+# color
+color:
+  # free: 10
+  # obstacle: 100
+  # uncertain: 55
+  # self: 200
+  # others: 150
+  # fog: 255
+  free: 0
+  obstacle: 100
+  uncertain: 50
+  self: 200
+  others: 150
+  fog: 255
+hyperparams:
+  alpha1: 0.01
+  alpha2: 0.01
