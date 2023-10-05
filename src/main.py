@@ -16,6 +16,36 @@ import glob
 import re
 import matplotlib.pyplot as plt
 import sys
+def find_min_convergence_region(filename, window_size=10, threshold=20):
+    # Read the file and extract eps and values
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+
+    episodes = []
+    values = []
+    for line in lines:
+        parts = line.split()
+        eps = int(parts[1])
+        val = int(parts[3])
+        episodes.append(eps)
+        values.append(val)
+
+    # Search for all convergence regions
+    regions = []
+    for i in range(len(values) - window_size):
+        window_values = values[i:i + window_size]
+        if (std := (sum(
+                (x - sum(window_values) / window_size) ** 2 for x in window_values) / window_size) ** 0.5) <= threshold:
+            regions.append((episodes[i], episodes[i + window_size - 1], sum(window_values) / window_size))
+
+    # If no regions found, return average of last 'window_size' values
+    if not regions:
+        last_values = values[-window_size:]
+        return (episodes[-window_size], episodes[-1], sum(last_values) / window_size)
+
+    # Find the region with the minimum average value
+    min_region = min(regions, key=lambda x: x[2])
+    return min_region
 
 
 def remove_files_with_prefix(directory, prefix):
@@ -38,15 +68,18 @@ def main():
 
     if len(sys.argv) != 2:
         print("Usage: python script.py <file_path>")
-    else:
-        # The first argument (index 0) is the script name; the second (index 1) is the file path
-        file_path = sys.argv[1]
+        exit()
+
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
 
     # tensorboard writer
     # CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
     CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
 
-    time_now = time.strftime("%m%d_%H%M%S") + file_path
+
+    file_path_without_extension, _ = os.path.splitext(file_path)
+    time_now = time.strftime("%m%d_%H%M%S") + file_path_without_extension
 
     writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
 
@@ -168,6 +201,7 @@ def main():
             # print("test")
             # render every 100 episodes to speed up training
             if i_episode % 1 == 0 and e_render:
+
                 world.render()
             obs_history = obs_history.type(FloatTensor)
             action_probs = maddpg.select_action(obs_history, pose, i_episode).data.cpu()
@@ -354,9 +388,14 @@ def main():
     file.close()
     world.close()
 
-    return final_total_counter, sum(total_counter_last_100) / len(total_counter_last_100)
+    result = find_min_convergence_region(os.getcwd() + '/../runs/' + time_now + '/smart_total_counter.txt')
+    if result:
+        return final_total_counter, result[2]
+    else:
+        return None
+    # return final_total_counter, sum(total_counter_last_100) / len(total_counter_last_100)
 
 
 if __name__ == "__main__":
-    returned_value, last_100_avg = main()
-    print(returned_value, last_100_avg)
+    returned_value, avg = main()
+    print(avg)
