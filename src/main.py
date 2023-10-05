@@ -18,6 +18,38 @@ import matplotlib.pyplot as plt
 import sys
 
 
+def find_min_convergence_region(filename, window_size=10, threshold=20):
+    # Read the file and extract eps and values
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+
+    episodes = []
+    values = []
+    for line in lines:
+        parts = line.split()
+        eps = int(parts[1])
+        val = int(parts[3])
+        episodes.append(eps)
+        values.append(val)
+
+    # Search for all convergence regions
+    regions = []
+    for i in range(len(values) - window_size):
+        window_values = values[i:i + window_size]
+        if (std := (sum(
+                (x - sum(window_values) / window_size) ** 2 for x in window_values) / window_size) ** 0.5) <= threshold:
+            regions.append((episodes[i], episodes[i + window_size - 1], sum(window_values) / window_size))
+
+    # If no regions found, return average of last 'window_size' values
+    if not regions:
+        last_values = values[-window_size:]
+        return (episodes[-window_size], episodes[-1], sum(last_values) / window_size)
+
+    # Find the region with the minimum average value
+    min_region = min(regions, key=lambda x: x[2])
+    return min_region
+
+
 def remove_files_with_prefix(directory, prefix):
     # Get a list of files matching the prefix pattern in the specified directory
     file_list = glob.glob(os.path.join(directory, f"{prefix}*"))
@@ -36,27 +68,30 @@ print(th.cuda.is_available())
 
 # tensorboard writer
 time_now = time.strftime("%m%d_%H%M%S")
-
 writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
+
+if len(sys.argv) != 2:
+    print("Usage: python script.py <file_path>")
+else:
+    # The first argument (index 0) is the script name; the second (index 1) is the file path
+    file_path = sys.argv[1]
+
+
+# CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
+CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
+
+file_path_without_extension, _ = os.path.splitext(file_path)
+time_now = time.strftime("%m%d_%H%M%S") + file_path_without_extension
 
 num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
 num_step_file.close()
 
+smart_total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/smart_total_counter.txt', "w")
+smart_total_counter_file.close()
+
 total_counter_file = open(os.getcwd()+'/../runs/'+time_now+'/total_counter.txt', "w")
 total_counter_file.close()
 
-# if len(sys.argv) != 2:
-#     print("Usage: python script.py <file_path>")
-# else:
-#     # The first argument (index 0) is the script name; the second (index 1) is the file path
-#     file_path = sys.argv[1]
-#
-#
-# # CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
-# CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
-
-
-CONFIG_PATH = os.getcwd() + '/../assets/config.yaml'
 with open(CONFIG_PATH,'r') as stream:
     config = yaml.safe_load(stream)
 
@@ -148,6 +183,7 @@ for i_episode in range(n_episode):
         obs_history[i] = np.vstack((obs_t_minus_0[i],obs_t_minus_1[i],obs_t_minus_2[i],
                             obs_t_minus_3[i],obs_t_minus_4[i],obs_t_minus_5[i]))
     counter_obs = []
+    smart_counter = 0
     for i in range(n_agents):
         counter_obs.append(0)
         # print("counter_obs init:", counter_obs)
@@ -246,10 +282,10 @@ for i_episode in range(n_episode):
     total_counter_file = open(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt', "a")
     total_counter = sum(counter_obs)
     total_counter_all.append(total_counter)
-    for i in range(n_agents):
-        total_counter_file.write("eps: " + str(i_episode) + " step for robot " + str(i) + ": " +
-                                 str(counter_obs[i]) + "\n")
-    total_counter_file.write("eps: " + str(i_episode) + " #total_counter: " + str(total_counter) + "\n")
+    # for i in range(n_agents):
+    #     total_counter_file.write("eps: " + str(i_episode) + " step for robot " + str(i) + ": " +
+    #                              str(counter_obs[i]) + "\n")
+    total_counter_file.write("eps: " + str(i_episode) + " #smart_total_counter: " + str(total_counter) + "\n")
     num_step_file.close()
     total_counter_file.close()
 
@@ -369,6 +405,10 @@ print("last 100 total counter is:", total_counter_last)
 # file.close()
 # file_2.close()
 world.close()
+result = find_min_convergence_region(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt')
+if result:
+    print("The average value is ", result[2])
+
 
 #
 # if __name__ == "__main__":
