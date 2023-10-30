@@ -84,6 +84,8 @@ CONFIG_PATH = os.getcwd() + '/../assets/' + file_path
 file_path_without_extension, _ = os.path.splitext(file_path)
 time_now = time.strftime("%m%d_%H%M%S") + file_path_without_extension
 
+writer = SummaryWriter(os.getcwd()+'/../runs/'+time_now)
+
 num_step_file = open(os.getcwd()+'/../runs/'+time_now+'/num_steps.txt', "w")
 num_step_file.close()
 
@@ -408,7 +410,7 @@ print("last 100 total counter is:", total_counter_last)
 world.close()
 result = find_min_convergence_region(os.getcwd() + '/../runs/' + time_now + '/total_counter.txt')
 if result:
-    print("The average value is ", result[2])
+    print(result[2])
 
 
 #
